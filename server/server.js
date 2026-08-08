@@ -13,6 +13,7 @@ const xss = require('xss-clean');
 
 const connectDB = require('./config/db');
 const errorHandler = require('./middleware/errorHandler');
+const AppError = require('./utils/AppError');
 const notFound = require('./middleware/notFound');
 const { apiLimiter } = require('./middleware/rateLimiters');
 
@@ -79,7 +80,10 @@ app.use(
         return callback(null, true);
       }
 
-      return callback(new Error('Not allowed by CORS'));
+      // A real AppError here (not a bare Error) so a CORS misconfiguration
+      // surfaces as a clean 403 instead of tripping errorHandler's generic
+      // "Something went wrong" 500 fallback for unexpected errors.
+      return callback(new AppError('Not allowed by CORS.', 403));
     },
     credentials: true,
   })
