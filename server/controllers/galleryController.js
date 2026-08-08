@@ -1,8 +1,8 @@
-const path = require('path');
-const fs = require('fs');
 const asyncHandler = require('../utils/asyncHandler');
 const AppError = require('../utils/AppError');
 const Gallery = require('../models/Gallery');
+const cloudinary = require('../config/cloudinary');
+const { destroyByUrl } = require('../utils/cloudinaryHelpers');
 
 const listGallery = asyncHandler(async (req, res) => {
   const filter = {};
@@ -16,7 +16,7 @@ const createGalleryItem = asyncHandler(async (req, res, next) => {
   if (!req.file) return next(new AppError('An image is required.', 400));
 
   const item = await Gallery.create({
-    image: `/uploads/gallery/${req.file.filename}`,
+    image: req.file.secure_url,
     caption: req.body.caption || '',
     product: req.body.product || null,
   });
@@ -29,8 +29,7 @@ const deleteGalleryItem = asyncHandler(async (req, res, next) => {
   const item = await Gallery.findByIdAndDelete(req.params.id);
   if (!item) return next(new AppError('Gallery item not found.', 404));
 
-  const imgPath = path.join(__dirname, '..', item.image);
-  fs.unlink(imgPath, () => {});
+  await destroyByUrl(cloudinary, item.image);
 
   res.status(200).json({ success: true, data: null });
 });

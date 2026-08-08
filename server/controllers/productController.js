@@ -1,10 +1,10 @@
-const path = require('path');
-const fs = require('fs');
 const asyncHandler = require('../utils/asyncHandler');
 const AppError = require('../utils/AppError');
 const Product = require('../models/Product');
 const Review = require('../models/Review');
 const APIFeatures = require('../utils/apiFeatures');
+const cloudinary = require('../config/cloudinary');
+const { destroyByUrl } = require('../utils/cloudinaryHelpers');
 
 const buildPublicFilter = (req) => {
   const filter = {};
@@ -90,7 +90,7 @@ const createProduct = asyncHandler(async (req, res) => {
   }
 
   if (req.files && req.files.length > 0) {
-    data.images = req.files.map((f) => `/uploads/products/${f.filename}`);
+    data.images = req.files.map((f) => f.secure_url);
   }
 
   const product = await Product.create(data);
@@ -107,7 +107,7 @@ const updateProduct = asyncHandler(async (req, res, next) => {
   }
 
   if (req.files && req.files.length > 0) {
-    const newImages = req.files.map((f) => `/uploads/products/${f.filename}`);
+    const newImages = req.files.map((f) => f.secure_url);
     data.images = [...(product.images || []), ...newImages];
   }
 
@@ -121,10 +121,7 @@ const deleteProduct = asyncHandler(async (req, res, next) => {
   const product = await Product.findByIdAndDelete(req.params.id);
   if (!product) return next(new AppError('Product not found.', 404));
 
-  (product.images || []).forEach((img) => {
-    const imgPath = path.join(__dirname, '..', img);
-    fs.unlink(imgPath, () => {});
-  });
+  await Promise.all((product.images || []).map((img) => destroyByUrl(cloudinary, img)));
 
   res.status(200).json({ success: true, data: null });
 });
@@ -137,8 +134,7 @@ const removeProductImage = asyncHandler(async (req, res, next) => {
   product.images = product.images.filter((img) => img !== imagePath);
   await product.save();
 
-  const fullPath = path.join(__dirname, '..', imagePath);
-  fs.unlink(fullPath, () => {});
+  await destroyByUrl(cloudinary, imagePath);
 
   res.status(200).json({ success: true, data: product });
 });

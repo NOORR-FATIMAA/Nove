@@ -31,6 +31,7 @@ const settingsRoutes = require('./routes/settingsRoutes');
 const bundleRoutes = require('./routes/bundleRoutes');
 const galleryRoutes = require('./routes/galleryRoutes');
 const offerRoutes = require('./routes/offerRoutes');
+const reviewRoutes = require('./routes/reviewRoutes');
 
 const app = express();
 
@@ -96,6 +97,19 @@ app.use(xss());
 
 app.use('/api', apiLimiter);
 
+// Ensures the DB is connected before any API route runs — a no-op after the
+// first request on a warm serverless instance (see config/db.js caching),
+// and the only thing that connects at all when this file is `require`d by
+// Vercel's api/index.js instead of run directly via `node server/server.js`.
+app.use('/api', async (req, res, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (err) {
+    next(err);
+  }
+});
+
 // --- Static files ---
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use('/admin', express.static(path.join(__dirname, '..', 'public', 'admin')));
@@ -117,6 +131,7 @@ app.use('/api/settings', settingsRoutes);
 app.use('/api/bundles', bundleRoutes);
 app.use('/api/gallery', galleryRoutes);
 app.use('/api/offers', offerRoutes);
+app.use('/api/reviews', reviewRoutes);
 
 app.get('/api/health', (req, res) => {
   res.status(200).json({ success: true, message: 'Nove API is running' });
@@ -128,21 +143,29 @@ app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
 
-const start = async () => {
-  try {
-    await connectDB();
-    app.listen(PORT, () => {
-      console.log(`Nove server running in ${process.env.NODE_ENV || 'development'} mode`);
-      console.log(`Storefront: http://localhost:${PORT}/index.html`);
-      console.log(`Admin:      http://localhost:${PORT}/admin/login.html`);
-    });
-  } catch (err) {
-    console.error('Failed to start server:', err);
-    process.exit(1);
-  }
-};
+// Only bind a port when this file is run directly (`node server/server.js` /
+// `npm run dev`). Vercel's api/index.js instead `require`s this module and
+// invokes the exported `app` per-request — calling app.listen() there would
+// be pointless (nothing owns that port in a serverless function) and the
+// per-request connectDB() middleware above already covers the DB connection
+// that `start()` used to make once at boot.
+if (require.main === module) {
+  const start = async () => {
+    try {
+      await connectDB();
+      app.listen(PORT, () => {
+        console.log(`Nove server running in ${process.env.NODE_ENV || 'development'} mode`);
+        console.log(`Storefront: http://localhost:${PORT}/index.html`);
+        console.log(`Admin:      http://localhost:${PORT}/admin/login.html`);
+      });
+    } catch (err) {
+      console.error('Failed to start server:', err);
+      process.exit(1);
+    }
+  };
 
-start();
+  start();
+}
 
 process.on('unhandledRejection', (err) => {
   console.error('UNHANDLED REJECTION:', err);

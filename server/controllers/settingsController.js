@@ -1,8 +1,8 @@
-const path = require('path');
-const fs = require('fs');
 const asyncHandler = require('../utils/asyncHandler');
 const AppError = require('../utils/AppError');
 const Settings = require('../models/Settings');
+const cloudinary = require('../config/cloudinary');
+const { destroyByUrl } = require('../utils/cloudinaryHelpers');
 
 const PUBLIC_FIELDS = [
   'usdExchangeRate',
@@ -66,16 +66,12 @@ const updateSettings = asyncHandler(async (req, res, next) => {
 
   if (req.files) {
     if (req.files.heroVideo && req.files.heroVideo[0]) {
-      if (settings.heroVideo && settings.heroVideo.startsWith('/uploads/')) {
-        fs.unlink(path.join(__dirname, '..', settings.heroVideo), () => {});
-      }
-      settings.heroVideo = `/uploads/hero/${req.files.heroVideo[0].filename}`;
+      if (settings.heroVideo) await destroyByUrl(cloudinary, settings.heroVideo);
+      settings.heroVideo = req.files.heroVideo[0].secure_url;
     }
     if (req.files.heroImage && req.files.heroImage[0]) {
-      if (settings.heroImage && settings.heroImage.startsWith('/uploads/')) {
-        fs.unlink(path.join(__dirname, '..', settings.heroImage), () => {});
-      }
-      settings.heroImage = `/uploads/hero/${req.files.heroImage[0].filename}`;
+      if (settings.heroImage) await destroyByUrl(cloudinary, settings.heroImage);
+      settings.heroImage = req.files.heroImage[0].secure_url;
     }
   }
 

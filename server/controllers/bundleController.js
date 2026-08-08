@@ -1,8 +1,8 @@
-const path = require('path');
-const fs = require('fs');
 const asyncHandler = require('../utils/asyncHandler');
 const AppError = require('../utils/AppError');
 const Bundle = require('../models/Bundle');
+const cloudinary = require('../config/cloudinary');
+const { destroyByUrl } = require('../utils/cloudinaryHelpers');
 
 const PRODUCT_FIELDS = 'name slug images price salePrice saleStartsAt saleEndsAt stock isActive attributes';
 
@@ -44,7 +44,7 @@ const createBundle = asyncHandler(async (req, res) => {
   const data = { ...req.body };
   if (typeof data.products === 'string') data.products = JSON.parse(data.products);
   if (req.files && req.files.length > 0) {
-    data.images = req.files.map((f) => `/uploads/bundles/${f.filename}`);
+    data.images = req.files.map((f) => f.secure_url);
   }
 
   const bundle = await Bundle.create(data);
@@ -60,7 +60,7 @@ const updateBundle = asyncHandler(async (req, res, next) => {
   if (typeof data.products === 'string') data.products = JSON.parse(data.products);
 
   if (req.files && req.files.length > 0) {
-    const newImages = req.files.map((f) => `/uploads/bundles/${f.filename}`);
+    const newImages = req.files.map((f) => f.secure_url);
     data.images = [...(bundle.images || []), ...newImages];
   }
 
@@ -75,10 +75,7 @@ const deleteBundle = asyncHandler(async (req, res, next) => {
   const bundle = await Bundle.findByIdAndDelete(req.params.id);
   if (!bundle) return next(new AppError('Bundle not found.', 404));
 
-  (bundle.images || []).forEach((img) => {
-    const imgPath = path.join(__dirname, '..', img);
-    fs.unlink(imgPath, () => {});
-  });
+  await Promise.all((bundle.images || []).map((img) => destroyByUrl(cloudinary, img)));
 
   res.status(200).json({ success: true, data: null });
 });

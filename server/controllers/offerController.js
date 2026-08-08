@@ -1,8 +1,8 @@
-const path = require('path');
-const fs = require('fs');
 const asyncHandler = require('../utils/asyncHandler');
 const AppError = require('../utils/AppError');
 const Offer = require('../models/Offer');
+const cloudinary = require('../config/cloudinary');
+const { destroyByUrl } = require('../utils/cloudinaryHelpers');
 
 const listOffers = asyncHandler(async (req, res) => {
   const isAdmin = req.user && req.user.role === 'admin';
@@ -18,7 +18,7 @@ const listOffers = asyncHandler(async (req, res) => {
 const createOffer = asyncHandler(async (req, res) => {
   const data = { ...req.body };
   if (req.file) {
-    data.image = `/uploads/offers/${req.file.filename}`;
+    data.image = req.file.secure_url;
   }
   const offer = await Offer.create(data);
   res.status(201).json({ success: true, data: offer });
@@ -30,10 +30,8 @@ const updateOffer = asyncHandler(async (req, res, next) => {
 
   const data = { ...req.body };
   if (req.file) {
-    data.image = `/uploads/offers/${req.file.filename}`;
-    if (offer.image) {
-      fs.unlink(path.join(__dirname, '..', offer.image), () => {});
-    }
+    data.image = req.file.secure_url;
+    if (offer.image) await destroyByUrl(cloudinary, offer.image);
   }
 
   Object.assign(offer, data);
@@ -46,9 +44,7 @@ const deleteOffer = asyncHandler(async (req, res, next) => {
   const offer = await Offer.findByIdAndDelete(req.params.id);
   if (!offer) return next(new AppError('Offer not found.', 404));
 
-  if (offer.image) {
-    fs.unlink(path.join(__dirname, '..', offer.image), () => {});
-  }
+  await destroyByUrl(cloudinary, offer.image);
 
   res.status(200).json({ success: true, data: null });
 });

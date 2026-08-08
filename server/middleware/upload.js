@@ -1,22 +1,22 @@
-const path = require('path');
 const multer = require('multer');
+const cloudinaryStorage = require('multer-storage-cloudinary');
+const cloudinary = require('../config/cloudinary');
 const AppError = require('../utils/AppError');
 
+// Vercel's serverless filesystem is ephemeral/read-only, so files go straight
+// to Cloudinary via a streaming multipart parser instead of local disk.
+const uniquePublicId = () => `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
+
 const storageFor = (subfolder) =>
-  multer.diskStorage({
-    destination: (req, file, cb) => {
-      cb(null, path.join(__dirname, '..', 'uploads', subfolder));
-    },
-    filename: (req, file, cb) => {
-      const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
-      cb(null, `${uniqueSuffix}${path.extname(file.originalname).toLowerCase()}`);
+  cloudinaryStorage({
+    cloudinary,
+    params: (req, file, cb) => {
+      cb(null, { folder: `nove/${subfolder}`, resource_type: 'image', public_id: uniquePublicId() });
     },
   });
 
 const imageFileFilter = (req, file, cb) => {
-  const allowed = ['.jpg', '.jpeg', '.png', '.webp', '.gif'];
-  const ext = path.extname(file.originalname).toLowerCase();
-  if (!allowed.includes(ext) || !file.mimetype.startsWith('image/')) {
+  if (!file.mimetype.startsWith('image/')) {
     return cb(new AppError('Only image files are allowed.', 400));
   }
   cb(null, true);
@@ -38,12 +38,11 @@ const uploadOfferImage = makeUploader('offers');
 // The hero background accepts either an admin-uploaded video or image (or
 // both, with heroMediaType deciding which one the storefront shows), so this
 // filter has to allow video files for the heroVideo field specifically while
-// still restricting heroImage — and any other field — to images.
+// still restricting heroImage — and any other field — to images. Cloudinary
+// also needs resource_type: 'video' for the video upload to succeed.
 const heroMediaFileFilter = (req, file, cb) => {
   if (file.fieldname === 'heroVideo') {
-    const allowedVideoExt = ['.mp4', '.webm', '.mov'];
-    const ext = path.extname(file.originalname).toLowerCase();
-    if (!allowedVideoExt.includes(ext) || !file.mimetype.startsWith('video/')) {
+    if (!file.mimetype.startsWith('video/')) {
       return cb(new AppError('Only video files (mp4, webm, mov) are allowed for the hero video.', 400));
     }
     return cb(null, true);
@@ -51,9 +50,23 @@ const heroMediaFileFilter = (req, file, cb) => {
   return imageFileFilter(req, file, cb);
 };
 
+const heroStorage = cloudinaryStorage({
+  cloudinary,
+  params: (req, file, cb) => {
+    cb(null, {
+      folder: 'nove/hero',
+      resource_type: file.fieldname === 'heroVideo' ? 'video' : 'image',
+      public_id: uniquePublicId(),
+    });
+  },
+});
+
 const uploadHeroMedia = multer({
-  storage: storageFor('hero'),
+  storage: heroStorage,
   fileFilter: heroMediaFileFilter,
+  // Note: Vercel serverless functions cap request bodies well below this
+  // (~4.5MB on Hobby/Pro) — large hero videos will need a direct-to-Cloudinary
+  // client upload if that limit is ever hit. Fine as-is for local/VPS hosting.
   limits: { fileSize: 25 * 1024 * 1024 },
 }).fields([
   { name: 'heroVideo', maxCount: 1 },
