@@ -411,6 +411,31 @@ p {
   display: flex;
 }
 
+@keyframes iconPulseBounce {
+  0% {
+    transform: scale(1);
+  }
+  30% {
+    transform: scale(1.35);
+  }
+  55% {
+    transform: scale(0.9);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.icon-link.icon-pulse {
+  animation: iconPulseBounce 0.4s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .icon-link.icon-pulse {
+    animation: none;
+  }
+}
+
 #authArea {
   display: flex;
   align-items: center;
@@ -457,6 +482,10 @@ p {
 
 .mobile-nav-toggle[aria-expanded="true"] .bar:nth-child(3) {
   transform: translateY(-7px) rotate(-45deg);
+}
+
+.mobile-tab-bar {
+  display: none;
 }
 
 /* ===== Footer ===== */
@@ -912,14 +941,33 @@ p {
 }
 
 .product-card .thumb-wrap img {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.2s ease;
+  transition: transform 0.2s ease, opacity 0.3s ease;
+}
+
+/* Second product image (if any) sits on top, hidden until hover, so hovering
+   crossfades from the primary shot to it. */
+.product-card .thumb-wrap .thumb-img-alt {
+  opacity: 0;
+  z-index: 1;
 }
 
 .product-card:hover .thumb-wrap img {
   transform: scale(1.05);
+}
+
+.product-card:hover .thumb-wrap .thumb-img-alt {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .product-card {
+    transform: none !important;
+  }
 }
 
 .product-card .sale-tag {
@@ -960,6 +1008,31 @@ p {
   flex-direction: column;
   gap: 6px;
   flex: 1;
+}
+
+.add-to-cart-btn.added {
+  background: var(--success);
+  border-color: var(--success);
+  color: #fff;
+  animation: addToCartPop 0.4s ease;
+}
+
+@keyframes addToCartPop {
+  0% {
+    transform: scale(1);
+  }
+  45% {
+    transform: scale(1.08);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .add-to-cart-btn.added {
+    animation: none;
+  }
 }
 
 .product-card .cat-label {
@@ -1047,6 +1120,50 @@ p {
   font-weight: 700;
   font-size: 0.85rem;
   color: var(--rose-dark);
+}
+
+/* ===== Testimonials ===== */
+
+.testimonial-row {
+  display: flex;
+  gap: 20px;
+  overflow-x: auto;
+  padding: 4px 4px 12px;
+  scroll-snap-type: x proximity;
+  -webkit-overflow-scrolling: touch;
+}
+
+.testimonial-card {
+  scroll-snap-align: start;
+  flex: 0 0 280px;
+  background: var(--white);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.testimonial-quote {
+  font-style: italic;
+  color: var(--ink);
+  flex: 1;
+  margin: 0;
+}
+
+.testimonial-author {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.85rem;
+}
+
+.testimonial-name {
+  font-weight: 700;
+}
+
+.testimonial-product {
+  color: var(--ink-soft);
 }
 
 .swatch-dot {
@@ -1566,6 +1683,144 @@ textarea {
   margin: 16px 0;
 }
 
+/* ===== Cart drawer ===== */
+
+body.cart-drawer-locked {
+  overflow: hidden;
+}
+
+.cart-drawer-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(58, 44, 48, 0.5);
+  z-index: 300;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+
+.cart-drawer-overlay.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.cart-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 380px;
+  max-width: 92vw;
+  background: var(--white);
+  box-shadow: var(--shadow);
+  z-index: 301;
+  display: flex;
+  flex-direction: column;
+  transform: translateX(100%);
+  transition: transform 0.3s ease;
+}
+
+.cart-drawer.open {
+  transform: translateX(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cart-drawer-overlay,
+  .cart-drawer {
+    transition: none;
+  }
+}
+
+.cart-drawer-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 22px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.cart-drawer-head h3 {
+  margin: 0;
+}
+
+.cart-drawer-close {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: none;
+  background: var(--cream-dark);
+  color: var(--ink);
+  font-size: 1.2rem;
+  line-height: 1;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.cart-drawer-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 4px 22px;
+}
+
+.cart-drawer-empty {
+  padding: 48px 0;
+  text-align: center;
+}
+
+.cart-drawer-footer {
+  padding: 18px 22px 22px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.cart-drawer-subtotal {
+  display: flex;
+  justify-content: space-between;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+/* Reuse the full cart page's .cart-item, but always in the compact
+   (mobile-width) layout since the drawer is narrow regardless of viewport. */
+.cart-drawer-body .cart-item {
+  grid-template-columns: 64px 1fr;
+  grid-template-areas:
+    'image name'
+    'image qty'
+    'image price';
+  row-gap: 6px;
+  padding: 14px 0;
+}
+
+.cart-drawer-body .cart-item img {
+  grid-area: image;
+  width: 64px;
+  height: 64px;
+}
+
+.cart-drawer-body .cart-item > div:first-of-type {
+  grid-area: name;
+}
+
+.cart-drawer-body .cart-item .qty-selector {
+  grid-area: qty;
+}
+
+.cart-drawer-body .cart-item > .price {
+  grid-area: price;
+}
+
+@media (max-width: 480px) {
+  .cart-drawer {
+    width: 100%;
+    max-width: 100vw;
+  }
+}
+
 /* ===== Checkout ===== */
 
 .checkout-layout {
@@ -1970,6 +2225,52 @@ textarea {
 
   .footer-grid {
     grid-template-columns: 1fr 1fr;
+  }
+
+  /* Bottom tab bar clears space at the foot of every page so it never sits
+     on top of footer content or (on product-details.html) the sticky
+     add-to-cart actions. */
+  body {
+    padding-bottom: 64px;
+  }
+
+  .mobile-tab-bar {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 90;
+    background: var(--header-bg);
+    backdrop-filter: blur(6px);
+    border-top: 1px solid var(--border);
+    padding: 6px 4px calc(6px + env(safe-area-inset-bottom));
+  }
+
+  .tab-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 6px 2px;
+    background: none;
+    border: none;
+    color: var(--ink-soft);
+    font-size: 0.68rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: var(--font-body);
+  }
+
+  .tab-item.active {
+    color: var(--rose-dark);
+  }
+
+  .tab-icon {
+    position: relative;
+    font-size: 1.25rem;
+    line-height: 1;
   }
 }
 

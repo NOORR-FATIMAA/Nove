@@ -2,9 +2,14 @@ const express = require('express');
 const { body, param } = require('express-validator');
 const validate = require('../middleware/validate');
 const { protect } = require('../middleware/auth');
-const { listReviews, createReview, updateReview, deleteReview } = require('../controllers/reviewController');
+const { listReviews, listFeaturedReviews, createReview, updateReview, deleteReview } = require('../controllers/reviewController');
 
 const router = express.Router({ mergeParams: true });
+
+// Mounted both nested under /products/:productId/reviews and at the
+// top-level /api/reviews (see server.js) — this route doesn't use
+// :productId, so it works identically either way.
+router.get('/featured', listFeaturedReviews);
 
 router.get('/', [param('productId').isMongoId()], validate, listReviews);
 

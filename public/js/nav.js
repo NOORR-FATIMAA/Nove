@@ -36,9 +36,18 @@ function renderAuthArea() {
   }
 }
 
+// Updates both the header icon badge and its mobile-tab-bar twin (if present).
+function setBadgeCount(ids, count) {
+  ids.forEach((id) => {
+    const badge = document.getElementById(id);
+    if (!badge) return;
+    badge.textContent = count;
+    badge.classList.toggle('show', count > 0);
+  });
+}
+
 async function updateCartBadge() {
-  const badge = document.getElementById('cartCount');
-  if (!badge) return;
+  if (!document.getElementById('cartCount') && !document.getElementById('tabCartCount')) return;
 
   let count = 0;
   if (window.noveUser) {
@@ -52,26 +61,22 @@ async function updateCartBadge() {
     count = guestCartCount();
   }
 
-  badge.textContent = count;
-  badge.classList.toggle('show', count > 0);
+  setBadgeCount(['cartCount', 'tabCartCount'], count);
 }
 
 async function updateWishlistBadge() {
-  const badge = document.getElementById('wishlistCount');
-  if (!badge) return;
+  if (!document.getElementById('wishlistCount') && !document.getElementById('tabWishlistCount')) return;
 
   if (!window.noveUser) {
-    badge.classList.remove('show');
+    setBadgeCount(['wishlistCount', 'tabWishlistCount'], 0);
     return;
   }
 
   try {
     const res = await api.get('/wishlist');
-    const count = res.data.products.length;
-    badge.textContent = count;
-    badge.classList.toggle('show', count > 0);
+    setBadgeCount(['wishlistCount', 'tabWishlistCount'], res.data.products.length);
   } catch (err) {
-    badge.classList.remove('show');
+    setBadgeCount(['wishlistCount', 'tabWishlistCount'], 0);
   }
 }
 
@@ -83,6 +88,54 @@ function highlightActiveNav() {
     const href = a.getAttribute('href').split('?')[0].split('/').pop();
     if (href === path) a.classList.add('active');
   });
+}
+
+// Fixed bottom nav shown only under the same ~900px breakpoint the header
+// collapses at (see mergeIntoMobileNav) — injected once per page, same
+// pattern as the cart drawer in cart.js, so no HTML page needs its own copy.
+function mobileTabBarMarkup(path, user) {
+  const accountHref = user ? '/account.html' : '/login.html';
+  const accountPage = user ? 'account.html' : 'login.html';
+  const isActive = (page) => (path === page ? ' active' : '');
+
+  return `
+    <nav class="mobile-tab-bar" id="mobileTabBar" aria-label="Primary">
+      <a href="/index.html" class="tab-item${isActive('index.html')}">
+        <span class="tab-icon" aria-hidden="true">&#127968;</span>
+        <span class="tab-label">Home</span>
+      </a>
+      <a href="/products.html" class="tab-item${isActive('products.html')}">
+        <span class="tab-icon" aria-hidden="true">&#128131;</span>
+        <span class="tab-label">Shop</span>
+      </a>
+      <a href="/wishlist.html" class="tab-item${isActive('wishlist.html')}">
+        <span class="tab-icon" aria-hidden="true">&#9825;<span class="badge" id="tabWishlistCount">0</span></span>
+        <span class="tab-label">Wishlist</span>
+      </a>
+      <button type="button" class="tab-item${isActive('cart.html')}" id="mobileTabCartBtn">
+        <span class="tab-icon" aria-hidden="true">&#128722;<span class="badge" id="tabCartCount">0</span></span>
+        <span class="tab-label">Cart</span>
+      </button>
+      <a href="${accountHref}" class="tab-item${isActive(accountPage)}">
+        <span class="tab-icon" aria-hidden="true">&#128100;</span>
+        <span class="tab-label">Account</span>
+      </a>
+    </nav>
+  `;
+}
+
+function renderMobileTabBar() {
+  if (document.getElementById('mobileTabBar')) return;
+
+  const path = window.location.pathname.split('/').pop() || 'index.html';
+  document.body.insertAdjacentHTML('beforeend', mobileTabBarMarkup(path, window.noveUser));
+
+  const cartBtn = document.getElementById('mobileTabCartBtn');
+  if (cartBtn) {
+    cartBtn.addEventListener('click', () => {
+      if (typeof window.openCartDrawer === 'function') window.openCartDrawer(cartBtn);
+    });
+  }
 }
 
 function wireSearchForm() {
@@ -259,6 +312,7 @@ function initMobileNav() {
 async function initNav() {
   await window.noveUserReady;
   renderAuthArea();
+  renderMobileTabBar();
   updateCartBadge();
   updateWishlistBadge();
   highlightActiveNav();

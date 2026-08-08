@@ -1,9 +1,13 @@
 // Handles: home page (categories + featured), products.html (listing/filters), product-details.html.
 
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
 function renderProductCard(product) {
   const price = productCurrentPrice(product);
   const onSale = price < product.price;
-  const img = (product.images && product.images[0]) || '/img/placeholder.svg';
+  const images = product.images && product.images.length ? product.images : ['/img/placeholder.svg'];
+  const img = images[0];
+  const altImg = images[1];
   const categoryName = product.category && product.category.name ? product.category.name : '';
   const attrs = product.attributes || {};
   const showSwatch = attrs.type === 'polish' && attrs.swatchHex;
@@ -14,7 +18,8 @@ function renderProductCard(product) {
         ${onSale ? '<span class="sale-tag">Sale</span>' : ''}
         <button type="button" class="wishlist-btn" data-product-id="${product._id}" aria-label="Add to wishlist">&#9825;</button>
         <a href="/product-details.html?slug=${encodeURIComponent(product.slug)}">
-          <img src="${escapeHtml(img)}" alt="${escapeHtml(product.name)}">
+          <img class="thumb-img thumb-img-primary" src="${escapeHtml(img)}" alt="${escapeHtml(product.name)}">
+          ${altImg ? `<img class="thumb-img thumb-img-alt" src="${escapeHtml(altImg)}" alt="" aria-hidden="true">` : ''}
         </a>
       </div>
       <div class="card-body">
@@ -39,19 +44,42 @@ function renderProductCard(product) {
 
 function wireAddToCartActions(container) {
   container.querySelectorAll('.add-to-cart-btn').forEach((btn) => {
+    const originalLabel = btn.textContent;
     btn.addEventListener('click', async () => {
       btn.disabled = true;
       try {
         await addProductToCart(btn.dataset.productId, 1);
-        btn.textContent = 'Added!';
+        btn.textContent = '✓ Added';
+        btn.classList.add('added');
         setTimeout(() => {
-          btn.textContent = 'Add to Cart';
+          btn.textContent = originalLabel;
+          btn.classList.remove('added');
           btn.disabled = false;
         }, 1200);
       } catch (err) {
         btn.disabled = false;
         alert(err.message);
       }
+    });
+  });
+}
+
+// Cursor-following tilt (max 4deg) on product card hover — skipped entirely
+// under prefers-reduced-motion, and naturally inert on touch devices since
+// they don't fire mousemove.
+function wireCardTilt(container) {
+  if (reduceMotion) return;
+  container.querySelectorAll('.product-card').forEach((card) => {
+    card.addEventListener('mousemove', (e) => {
+      const rect = card.getBoundingClientRect();
+      const px = (e.clientX - rect.left) / rect.width;
+      const py = (e.clientY - rect.top) / rect.height;
+      const tiltX = (0.5 - py) * 8; // -4deg..4deg
+      const tiltY = (px - 0.5) * 8;
+      card.style.transform = `perspective(700px) rotateX(${tiltX.toFixed(2)}deg) rotateY(${tiltY.toFixed(2)}deg) translateY(-4px)`;
+    });
+    card.addEventListener('mouseleave', () => {
+      card.style.transform = '';
     });
   });
 }
@@ -79,6 +107,7 @@ function wireWishlistAddActions(container) {
 function wireProductCardActions(container) {
   wireAddToCartActions(container);
   wireWishlistAddActions(container);
+  wireCardTilt(container);
 }
 
 // --- Home page ---

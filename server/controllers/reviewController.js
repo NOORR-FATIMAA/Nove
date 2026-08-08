@@ -10,6 +10,16 @@ const listReviews = asyncHandler(async (req, res) => {
   res.status(200).json({ success: true, count: reviews.length, data: reviews });
 });
 
+// Top-rated reviews across all products, for the homepage testimonials strip.
+const listFeaturedReviews = asyncHandler(async (req, res) => {
+  const reviews = await Review.find({ rating: { $gte: 4 } })
+    .populate('user', 'name')
+    .populate('product', 'name slug')
+    .sort('-rating -createdAt')
+    .limit(8);
+  res.status(200).json({ success: true, count: reviews.length, data: reviews });
+});
+
 const createReview = asyncHandler(async (req, res, next) => {
   const product = await Product.findById(req.params.productId);
   if (!product) return next(new AppError('Product not found.', 404));
@@ -59,4 +69,4 @@ const deleteReview = asyncHandler(async (req, res, next) => {
   res.status(200).json({ success: true, data: null });
 });
 
-module.exports = { listReviews, createReview, updateReview, deleteReview };
+module.exports = { listReviews, listFeaturedReviews, createReview, updateReview, deleteReview };

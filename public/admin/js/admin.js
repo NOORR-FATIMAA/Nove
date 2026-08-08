@@ -342,6 +342,12 @@ function openCategoryForm(category) {
   hideAlert(document.getElementById('categoryFormAlert'));
   form.categoryId.value = category ? category._id : '';
 
+  const existingImage = document.getElementById('cExistingImage');
+  existingImage.innerHTML =
+    category && category.image
+      ? `<div class="img-chip"><img src="${escapeHtml(category.image)}" alt=""></div>`
+      : '';
+
   if (category) {
     form.name.value = category.name;
     form.description.value = category.description || '';

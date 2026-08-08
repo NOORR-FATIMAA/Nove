@@ -26,6 +26,7 @@ async function initWishlistPage() {
     if (emptyState) emptyState.style.display = 'none';
     grid.innerHTML = products.map(renderProductCard).join('');
     wireAddToCartActions(grid);
+    wireCardTilt(grid);
     if (window.NoveAnimations) window.NoveAnimations.observeReveal(grid);
 
     grid.querySelectorAll('.wishlist-btn').forEach((btn) => {
