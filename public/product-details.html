@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Product — Nove</title>
+  <link rel="icon" type="image/png" href="/img/logo.png">
+  <link rel="stylesheet" href="/css/style.css">
+  <script src="/js/theme.js"></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="/index.html" class="logo"><img src="/img/logo.png" alt="Nove" class="logo-img"></a>
+      <nav class="main-nav" id="mainNav">
+        <a href="/index.html">Home</a>
+        <a href="/products.html">Products</a>
+        <a href="/about.html">About</a>
+        <a href="/contact.html">Contact</a>
+      </nav>
+      <div class="header-actions">
+        <form class="nav-search" id="navSearchForm">
+          <input type="search" id="navSearchInput" placeholder="Search shades, sets...">
+        </form>
+        <a href="/wishlist.html" class="icon-link" aria-label="Wishlist">&#9825;<span class="badge" id="wishlistCount">0</span></a>
+        <a href="/cart.html" class="icon-link" aria-label="Cart">&#128717;<span class="badge" id="cartCount">0</span></a>
+        <div id="themeToggle" class="theme-toggle"></div>
+        <div id="authArea"></div>
+        <button type="button" class="mobile-nav-toggle" id="mobileNavToggle" aria-label="Toggle menu" aria-expanded="false" aria-controls="mainNav">
+          <span class="bar"></span>
+          <span class="bar"></span>
+          <span class="bar"></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="section">
+    <div class="container" id="productDetailRoot">
+      <div class="product-detail">
+        <div class="gallery">
+          <div class="gallery-main">
+            <img id="galleryMainImg" src="" alt="">
+          </div>
+          <div class="gallery-thumbs" id="galleryThumbs"></div>
+        </div>
+
+        <div class="detail-info">
+          <span class="cat-label" id="detailCategory"></span>
+          <h1 id="detailName"></h1>
+          <span class="stars" id="detailRatingStars"></span>
+          <span id="detailRatingCount"></span>
+
+          <div class="detail-price">
+            <span id="detailPrice"></span>
+            <span class="price-strike" id="detailPriceStrike"></span>
+          </div>
+
+          <div id="productAttributes"></div>
+
+          <div class="detail-actions">
+            <div class="qty-selector">
+              <button type="button" id="qtyDec">-</button>
+              <input type="number" id="qtyInput" value="1" min="1">
+              <button type="button" id="qtyInc">+</button>
+            </div>
+            <button type="button" class="btn" id="addToCartBtn">Add to Cart</button>
+            <button type="button" class="btn btn-outline" id="detailWishlistBtn">&#9825; Wishlist</button>
+          </div>
+
+          <p class="stock-note" id="stockNote"></p>
+
+          <button type="button" class="btn btn-ghost btn-sm size-guide-trigger" id="sizeGuideTrigger" style="display:none;padding-left:0;">📏 Size &amp; Fit Guide</button>
+
+          <div class="tabs">
+            <button type="button" class="tab-btn active" data-tab-target="tabDescription">Description</button>
+            <button type="button" class="tab-btn" data-tab-target="tabReviews">Reviews</button>
+          </div>
+
+          <div class="tab-panel active" id="tabDescription">
+            <p id="detailDescription"></p>
+          </div>
+
+          <div class="tab-panel" id="tabReviews">
+            <div id="reviewsList"></div>
+
+            <h4 style="margin-top:24px;">Write a Review</h4>
+            <p id="reviewLoginPrompt" style="display:none;"><a href="/login.html">Log in</a> to write a review.</p>
+            <form id="reviewForm">
+              <div class="alert" id="reviewFormAlert"></div>
+              <div class="form-group">
+                <label for="reviewRating">Rating</label>
+                <select id="reviewRating" name="rating" required>
+                  <option value="5">5 - Excellent</option>
+                  <option value="4">4 - Good</option>
+                  <option value="3">3 - Average</option>
+                  <option value="2">2 - Poor</option>
+                  <option value="1">1 - Terrible</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="reviewComment">Comment</label>
+                <textarea id="reviewComment" name="comment" required></textarea>
+              </div>
+              <button type="submit" class="btn">Submit Review</button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <section class="section" id="productGallerySection" style="display:none;padding-bottom:0;">
+        <h2 class="section-title reveal">Styled by Customers</h2>
+        <div class="gallery-masonry" id="productGalleryGrid"></div>
+      </section>
+    </div>
+  </main>
+
+  <div class="modal-overlay" id="sizeGuideModal">
+    <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="sizeGuideTitle">
+      <button type="button" class="modal-close" id="sizeGuideCloseBtn" aria-label="Close">&times;</button>
+      <h2 id="sizeGuideTitle">Press-On Size &amp; Fit Guide</h2>
+      <img src="/img/size-guide-chart.svg" alt="Nail size chart showing sizes 1 through 5 for thumb through pinky on both hands" class="size-guide-img">
+      <h3>How to measure</h3>
+      <ol class="size-guide-steps">
+        <li>Measure the width of each natural nail bed at its widest point, edge to edge.</li>
+        <li>Compare each measurement to the closest size in the chart above — sizes typically run largest at the thumb (1) to smallest at the pinky (5).</li>
+        <li>If you're between two sizes, size up and gently file the edge for a precise fit.</li>
+        <li>Each Nove press-on set includes multiple sizes per nail position so you can custom-fit both hands.</li>
+      </ol>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <h4>Nove</h4>
+          <p>Glossy press-on nails, polish, and nail art supplies for your at-home mani moment.</p>
+        </div>
+        <div>
+          <h4>Shop</h4>
+          <a href="/products.html?type=polish">Polish</a>
+          <a href="/products.html?type=press-ons">Press-Ons</a>
+          <a href="/products.html?type=nail-art-supplies">Nail Art Supplies</a>
+        </div>
+        <div>
+          <h4>Support</h4>
+          <a href="/about.html">About Us</a>
+          <a href="/contact.html">Contact</a>
+          <a href="/orders.html">Order Status</a>
+        </div>
+        <div>
+          <h4>Stay in the Loop</h4>
+          <p>Sign up for shade drops &amp; offers.</p>
+          <form class="newsletter-form" id="newsletterForm">
+            <input type="email" name="email" placeholder="you@email.com" required>
+            <button type="submit" class="btn btn-sm">Join</button>
+          </form>
+          <p id="newsletterMsg" style="font-size:0.8rem;margin-top:8px;"></p>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        &copy; 2026 Nove. All rights reserved.
+        <div id="currencyControl" class="currency-control"></div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/storage.js"></script>
+  <script src="/js/currency.js"></script>
+  <script src="/js/nav.js"></script>
+  <script src="/js/cart.js"></script>
+  <script src="/js/products.js"></script>
+  <script src="/js/gallery.js"></script>
+  <script src="/js/animations.js"></script>
+</body>
+</html>

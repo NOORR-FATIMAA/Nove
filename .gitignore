@@ -1,0 +1,17 @@
+node_modules/
+.env
+server/uploads/products/*
+server/uploads/categories/*
+server/uploads/bundles/*
+server/uploads/gallery/*
+server/uploads/hero/*
+server/uploads/offers/*
+!server/uploads/products/.gitkeep
+!server/uploads/categories/.gitkeep
+!server/uploads/bundles/.gitkeep
+!server/uploads/gallery/.gitkeep
+!server/uploads/hero/.gitkeep
+!server/uploads/offers/.gitkeep
+npm-debug.log*
+.DS_Store
+*.log

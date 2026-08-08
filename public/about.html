@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About Us — Nove</title>
+  <link rel="icon" type="image/png" href="/img/logo.png">
+  <link rel="stylesheet" href="/css/style.css">
+  <script src="/js/theme.js"></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="/index.html" class="logo"><img src="/img/logo.png" alt="Nove" class="logo-img"></a>
+      <nav class="main-nav" id="mainNav">
+        <a href="/index.html">Home</a>
+        <a href="/products.html">Products</a>
+        <a href="/about.html" class="active">About</a>
+        <a href="/contact.html">Contact</a>
+      </nav>
+      <div class="header-actions">
+        <a href="/wishlist.html" class="icon-link" aria-label="Wishlist">&#9825;<span class="badge" id="wishlistCount">0</span></a>
+        <a href="/cart.html" class="icon-link" aria-label="Cart">&#128717;<span class="badge" id="cartCount">0</span></a>
+        <div id="themeToggle" class="theme-toggle"></div>
+        <div id="authArea"></div>
+        <button type="button" class="mobile-nav-toggle" id="mobileNavToggle" aria-label="Toggle menu" aria-expanded="false" aria-controls="mainNav">
+          <span class="bar"></span>
+          <span class="bar"></span>
+          <span class="bar"></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="about-hero">
+      <div class="container">
+        <h1 id="aboutHeroTitle">Nove is glossy, easy, at-home nail beauty.</h1>
+        <p id="aboutHeroSubtitle" style="max-width:600px;margin:0 auto;color:var(--ink-soft);">We make press-on nails, polish, and nail art supplies for people who want salon-quality results without the salon wait.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <h2 class="section-title reveal">Our Values</h2>
+        <div class="value-grid" id="aboutValuesGrid">
+          <div class="value-card reveal">
+            <h3>Glossy Quality</h3>
+            <p>Every polish and press-on set is tested for long wear and a true glass-like finish.</p>
+          </div>
+          <div class="value-card reveal">
+            <h3>Made for Home</h3>
+            <p>No salon appointment needed — our kits are designed for a flawless at-home application.</p>
+          </div>
+          <div class="value-card reveal">
+            <h3>Cruelty-Free</h3>
+            <p>All Nove products are cruelty-free and formulated with your nail health in mind.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-bottom">
+        &copy; 2026 Nove. All rights reserved.
+        <div id="currencyControl" class="currency-control"></div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/storage.js"></script>
+  <script src="/js/currency.js"></script>
+  <script src="/js/nav.js"></script>
+  <script src="/js/about.js"></script>
+  <script src="/js/animations.js"></script>
+</body>
+</html>

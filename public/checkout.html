@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Checkout — Nove</title>
+  <link rel="icon" type="image/png" href="/img/logo.png">
+  <link rel="stylesheet" href="/css/style.css">
+  <script src="/js/theme.js"></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="/index.html" class="logo"><img src="/img/logo.png" alt="Nove" class="logo-img"></a>
+      <nav class="main-nav" id="mainNav">
+        <a href="/index.html">Home</a>
+        <a href="/products.html">Products</a>
+        <a href="/about.html">About</a>
+        <a href="/contact.html">Contact</a>
+      </nav>
+      <div class="header-actions">
+        <a href="/wishlist.html" class="icon-link" aria-label="Wishlist">&#9825;<span class="badge" id="wishlistCount">0</span></a>
+        <a href="/cart.html" class="icon-link" aria-label="Cart">&#128717;<span class="badge" id="cartCount">0</span></a>
+        <div id="themeToggle" class="theme-toggle"></div>
+        <div id="authArea"></div>
+        <button type="button" class="mobile-nav-toggle" id="mobileNavToggle" aria-label="Toggle menu" aria-expanded="false" aria-controls="mainNav">
+          <span class="bar"></span>
+          <span class="bar"></span>
+          <span class="bar"></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="section">
+    <div class="container" id="checkoutRoot">
+      <h1 class="section-title" style="text-align:left;">Checkout</h1>
+
+      <div class="checkout-layout">
+        <div>
+          <div class="card reveal">
+            <h3>Shipping Address</h3>
+            <div id="savedAddresses"></div>
+
+            <form id="checkoutForm">
+              <div class="alert" id="checkoutAlert"></div>
+
+              <div class="form-group" id="guestEmailGroup" style="display:none;">
+                <label for="guestEmail">Email (for order updates)</label>
+                <input type="email" id="guestEmail" name="guestEmail">
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="fullName">Full Name</label>
+                  <input type="text" id="fullName" name="fullName" required>
+                </div>
+                <div class="form-group">
+                  <label for="phone">Phone</label>
+                  <input type="tel" id="phone" name="phone" required>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="line1">Address Line 1</label>
+                <input type="text" id="line1" name="line1" required>
+              </div>
+              <div class="form-group">
+                <label for="line2">Address Line 2 (optional)</label>
+                <input type="text" id="line2" name="line2">
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="city">City</label>
+                  <input type="text" id="city" name="city" required>
+                </div>
+                <div class="form-group">
+                  <label for="state">State / Province</label>
+                  <input type="text" id="state" name="state">
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="postalCode">Postal Code</label>
+                  <input type="text" id="postalCode" name="postalCode" required>
+                </div>
+                <div class="form-group">
+                  <label for="country">Country</label>
+                  <input type="text" id="country" name="country" required value="Pakistan">
+                </div>
+              </div>
+
+              <h3>Payment Method</h3>
+              <label class="payment-option">
+                <input type="radio" name="paymentMethod" value="cod" checked>
+                Cash on Delivery
+              </label>
+              <label class="payment-option">
+                <input type="radio" name="paymentMethod" value="card">
+                Credit / Debit Card
+              </label>
+
+              <button type="submit" class="btn btn-block" style="margin-top:20px;">Place Order</button>
+            </form>
+          </div>
+
+          <div class="card reveal" id="pointsRedeemCard" style="display:none;">
+            <h3>Loyalty Points</h3>
+            <p>You have <strong id="pointsAvailable">0</strong> points available (worth <span id="pointsAvailableValue"></span>).</p>
+            <div class="coupon-row">
+              <input type="number" id="pointsRedeemInput" min="0" placeholder="Points to redeem">
+              <button type="button" class="btn btn-sm" id="applyPointsBtn">Apply</button>
+            </div>
+            <p id="pointsAppliedNote" style="font-size:0.85rem;font-weight:600;color:var(--success);"></p>
+          </div>
+        </div>
+
+        <div class="summary-card reveal">
+          <h3>Order Summary</h3>
+          <div id="checkoutItemsList"></div>
+          <div class="summary-row" style="margin-top:14px;">
+            <span>Subtotal</span>
+            <span id="checkoutSubtotal">Rs 0</span>
+          </div>
+          <div class="summary-row" id="checkoutDiscountRow" style="display:none;">
+            <span>Discount</span>
+            <span id="checkoutDiscount">-Rs 0</span>
+          </div>
+          <div class="summary-row" id="checkoutPointsRow" style="display:none;">
+            <span>Points redeemed</span>
+            <span id="checkoutPointsDiscount">-Rs 0</span>
+          </div>
+          <div class="summary-row total">
+            <span>Estimated Total</span>
+            <span id="checkoutTotal">Rs 0</span>
+          </div>
+          <p style="font-size:0.78rem;color:var(--ink-soft);">Final pricing, including shipping, is confirmed by our server when your order is placed.</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-bottom">
+        &copy; 2026 Nove. All rights reserved.
+        <div id="currencyControl" class="currency-control"></div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/storage.js"></script>
+  <script src="/js/currency.js"></script>
+  <script src="/js/nav.js"></script>
+  <script src="/js/cart.js"></script>
+  <script src="/js/checkout.js"></script>
+  <script src="/js/animations.js"></script>
+</body>
+</html>

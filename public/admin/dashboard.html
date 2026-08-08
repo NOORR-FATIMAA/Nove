@@ -1,0 +1,511 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard — Nove</title>
+  <link rel="icon" type="image/png" href="/img/logo.png">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/admin/css/admin.css">
+  <script src="/js/theme.js"></script>
+</head>
+<body class="admin-body">
+  <div class="admin-shell">
+    <aside class="admin-sidebar">
+      <span class="logo"><img src="/img/logo.png" alt="Nove" class="admin-logo-img"> Admin</span>
+      <nav class="admin-nav">
+        <button type="button" data-panel="panelDashboard" class="active">Dashboard</button>
+        <button type="button" data-panel="panelProducts">Products</button>
+        <button type="button" data-panel="panelCategories">Categories</button>
+        <button type="button" data-panel="panelBundles">Bundles</button>
+        <button type="button" data-panel="panelOffers">Offers</button>
+        <button type="button" data-panel="panelGallery">Gallery</button>
+        <button type="button" data-panel="panelOrders">Orders</button>
+        <button type="button" data-panel="panelCoupons">Coupons</button>
+        <button type="button" data-panel="panelMessages">Messages</button>
+        <button type="button" data-panel="panelAbout">About Page</button>
+        <button type="button" data-panel="panelSettings">Settings</button>
+      </nav>
+      <button type="button" class="logout-btn" id="adminLogoutBtn">Log Out</button>
+    </aside>
+
+    <main class="admin-main">
+      <div class="admin-topbar">
+        <h2 id="adminGreeting">Welcome back</h2>
+        <div id="themeToggle" class="theme-toggle"></div>
+      </div>
+
+      <!-- Dashboard -->
+      <section class="admin-panel active" id="panelDashboard">
+        <div class="stat-grid">
+          <div class="stat-card"><div class="stat-label">Revenue (paid)</div><div class="stat-value" id="statRevenue">Rs 0</div></div>
+          <div class="stat-card"><div class="stat-label">Total Orders</div><div class="stat-value" id="statOrders">0</div></div>
+          <div class="stat-card"><div class="stat-label">Customers</div><div class="stat-value" id="statCustomers">0</div></div>
+          <div class="stat-card"><div class="stat-label">Products</div><div class="stat-value" id="statProducts">0</div></div>
+        </div>
+
+        <div class="panel-toolbar"><h3>Low Stock Products</h3></div>
+        <div class="data-table-wrap" style="margin-bottom:30px;">
+          <table class="data-table">
+            <thead><tr><th>Name</th><th>SKU</th><th>Stock</th></tr></thead>
+            <tbody id="lowStockTableBody"></tbody>
+          </table>
+        </div>
+
+        <div class="panel-toolbar"><h3>Recent Orders</h3></div>
+        <div class="data-table-wrap">
+          <table class="data-table">
+            <thead><tr><th>Order #</th><th>Customer</th><th>Total</th><th>Status</th><th>Date</th></tr></thead>
+            <tbody id="recentOrdersTableBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Products -->
+      <section class="admin-panel" id="panelProducts">
+        <div class="panel-toolbar">
+          <h3>Products</h3>
+          <div style="display:flex;gap:8px;">
+            <button type="button" class="btn btn-sm btn-outline" id="goToBannerSettingsBtn">📢 Set Homepage Banner</button>
+            <button type="button" class="btn btn-sm" id="showAddProductBtn">+ Add Product</button>
+          </div>
+        </div>
+
+        <form class="slide-form" id="productForm">
+          <input type="hidden" name="productId">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="pName">Name</label>
+              <input type="text" id="pName" name="name" required>
+            </div>
+            <div class="form-group">
+              <label for="pSku">SKU</label>
+              <input type="text" id="pSku" name="sku" required>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="pCategory">Category</label>
+              <select id="pCategory" name="category" required></select>
+            </div>
+            <div class="form-group">
+              <label for="pType">Type</label>
+              <select id="pType" name="type" required>
+                <option value="polish">Polish</option>
+                <option value="press-ons">Press-Ons</option>
+                <option value="nail-art-supplies">Nail Art Supplies</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="pDescription">Description</label>
+            <textarea id="pDescription" name="description"></textarea>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="pPrice">Price</label>
+              <input type="number" step="0.01" min="0" id="pPrice" name="price" required>
+            </div>
+            <div class="form-group">
+              <label for="pSalePrice">Sale Price (optional)</label>
+              <input type="number" step="0.01" min="0" id="pSalePrice" name="salePrice">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="pSaleStartsAt">Sale Starts (optional)</label>
+              <input type="date" id="pSaleStartsAt" name="saleStartsAt">
+            </div>
+            <div class="form-group">
+              <label for="pSaleEndsAt">Sale Ends (optional)</label>
+              <input type="date" id="pSaleEndsAt" name="saleEndsAt">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="pStock">Stock</label>
+              <input type="number" min="0" id="pStock" name="stock" required>
+            </div>
+            <div class="form-group">
+              <label for="pShade">Shade (optional)</label>
+              <input type="text" id="pShade" name="shade">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="pFinish">Finish (optional)</label>
+              <input type="text" id="pFinish" name="finish">
+            </div>
+            <div class="form-group">
+              <label for="pSize">Size (optional)</label>
+              <input type="text" id="pSize" name="size">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="pSwatchHex">Shade swatch color (polish only)</label>
+            <input type="color" id="pSwatchHex" name="swatchHex" value="#d97ea0" style="width:60px;padding:4px;">
+          </div>
+          <label class="checkbox-row"><input type="checkbox" name="isFeatured" id="pFeatured"><span>Featured product</span></label>
+          <label class="checkbox-row"><input type="checkbox" name="isActive" id="pActive" checked><span>Active (visible on storefront)</span></label>
+
+          <div class="form-group">
+            <label for="pImages">Images</label>
+            <input type="file" id="pImages" name="images" accept="image/*" multiple>
+            <div class="image-preview-row" id="pExistingImages"></div>
+          </div>
+
+          <div class="alert" id="productFormAlert"></div>
+          <div style="display:flex;gap:10px;">
+            <button type="submit" class="btn">Save Product</button>
+            <button type="button" class="btn btn-outline" id="cancelProductFormBtn">Cancel</button>
+          </div>
+        </form>
+
+        <div class="data-table-wrap">
+          <table class="data-table">
+            <thead><tr><th>Image</th><th>Name</th><th>SKU</th><th>Category</th><th>Price</th><th>Stock</th><th>Active</th><th>Actions</th></tr></thead>
+            <tbody id="productsTableBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Categories -->
+      <section class="admin-panel" id="panelCategories">
+        <div class="panel-toolbar">
+          <h3>Categories</h3>
+          <button type="button" class="btn btn-sm" id="showAddCategoryBtn">+ Add Category</button>
+        </div>
+
+        <form class="slide-form" id="categoryForm">
+          <input type="hidden" name="categoryId">
+          <div class="form-group">
+            <label for="cName">Name</label>
+            <input type="text" id="cName" name="name" required>
+          </div>
+          <div class="form-group">
+            <label for="cDescription">Description</label>
+            <textarea id="cDescription" name="description"></textarea>
+          </div>
+          <label class="checkbox-row"><input type="checkbox" name="isActive" id="cActive" checked><span>Active</span></label>
+          <div class="form-group">
+            <label for="cImage">Image</label>
+            <input type="file" id="cImage" name="image" accept="image/*">
+          </div>
+          <div class="alert" id="categoryFormAlert"></div>
+          <div style="display:flex;gap:10px;">
+            <button type="submit" class="btn">Save Category</button>
+            <button type="button" class="btn btn-outline" id="cancelCategoryFormBtn">Cancel</button>
+          </div>
+        </form>
+
+        <div class="data-table-wrap">
+          <table class="data-table">
+            <thead><tr><th>Image</th><th>Name</th><th>Slug</th><th>Active</th><th>Actions</th></tr></thead>
+            <tbody id="categoriesTableBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Bundles -->
+      <section class="admin-panel" id="panelBundles">
+        <div class="panel-toolbar">
+          <h3>Bundles</h3>
+          <button type="button" class="btn btn-sm" id="showAddBundleBtn">+ Add Bundle</button>
+        </div>
+
+        <form class="slide-form" id="bundleForm">
+          <input type="hidden" name="bundleId">
+          <div class="form-group">
+            <label for="bName">Name</label>
+            <input type="text" id="bName" name="name" required>
+          </div>
+          <div class="form-group">
+            <label for="bDescription">Description</label>
+            <textarea id="bDescription" name="description"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="bPrice">Bundle Price</label>
+            <input type="number" step="0.01" min="0" id="bPrice" name="bundlePrice" required>
+          </div>
+          <div class="form-group">
+            <label>Products in this bundle</label>
+            <div id="bundleProductRows"></div>
+            <button type="button" class="btn btn-sm btn-outline" id="addBundleProductRowBtn">+ Add Product</button>
+          </div>
+          <label class="checkbox-row"><input type="checkbox" name="isActive" id="bActive" checked><span>Active</span></label>
+          <div class="form-group">
+            <label for="bImages">Images</label>
+            <input type="file" id="bImages" name="images" accept="image/*" multiple>
+            <div class="image-preview-row" id="bExistingImages"></div>
+          </div>
+          <div class="alert" id="bundleFormAlert"></div>
+          <div style="display:flex;gap:10px;">
+            <button type="submit" class="btn">Save Bundle</button>
+            <button type="button" class="btn btn-outline" id="cancelBundleFormBtn">Cancel</button>
+          </div>
+        </form>
+
+        <div class="data-table-wrap">
+          <table class="data-table">
+            <thead><tr><th>Image</th><th>Name</th><th>Items</th><th>Bundle Price</th><th>Active</th><th>Actions</th></tr></thead>
+            <tbody id="bundlesTableBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Offers -->
+      <section class="admin-panel" id="panelOffers">
+        <div class="panel-toolbar">
+          <h3>Special Offers</h3>
+          <button type="button" class="btn btn-sm" id="showAddOfferBtn">+ Add Offer</button>
+        </div>
+
+        <form class="slide-form" id="offerForm">
+          <input type="hidden" name="offerId">
+          <div class="form-group">
+            <label for="oTitle">Title</label>
+            <input type="text" id="oTitle" name="title" required>
+          </div>
+          <div class="form-group">
+            <label for="oDescription">Description</label>
+            <textarea id="oDescription" name="description"></textarea>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="oBadge">Badge (optional)</label>
+              <input type="text" id="oBadge" name="badge" placeholder="e.g. 20% OFF">
+            </div>
+            <div class="form-group">
+              <label for="oLink">Links to</label>
+              <input type="text" id="oLink" name="link" placeholder="/products.html?type=polish" value="/products.html">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="oExpiresAt">Expires (optional)</label>
+            <input type="date" id="oExpiresAt" name="expiresAt">
+          </div>
+          <label class="checkbox-row"><input type="checkbox" name="isActive" id="oActive" checked><span>Active</span></label>
+          <div class="form-group">
+            <label for="oImage">Image</label>
+            <input type="file" id="oImage" name="image" accept="image/*">
+            <div class="image-preview-row" id="oExistingImage"></div>
+          </div>
+          <div class="alert" id="offerFormAlert"></div>
+          <div style="display:flex;gap:10px;">
+            <button type="submit" class="btn">Save Offer</button>
+            <button type="button" class="btn btn-outline" id="cancelOfferFormBtn">Cancel</button>
+          </div>
+        </form>
+
+        <div class="data-table-wrap">
+          <table class="data-table">
+            <thead><tr><th>Image</th><th>Title</th><th>Badge</th><th>Expires</th><th>Active</th><th>Actions</th></tr></thead>
+            <tbody id="offersTableBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Gallery -->
+      <section class="admin-panel" id="panelGallery">
+        <div class="panel-toolbar">
+          <h3>UGC / Try-On Gallery</h3>
+          <button type="button" class="btn btn-sm" id="showAddGalleryBtn">+ Add Photo</button>
+        </div>
+
+        <form class="slide-form" id="galleryForm">
+          <div class="form-group">
+            <label for="gImage">Photo</label>
+            <input type="file" id="gImage" name="image" accept="image/*" required>
+          </div>
+          <div class="form-group">
+            <label for="gCaption">Caption</label>
+            <input type="text" id="gCaption" name="caption" placeholder="e.g. @customer wearing Rosewater Glaze">
+          </div>
+          <div class="form-group">
+            <label for="gProduct">Linked product (optional)</label>
+            <select id="gProduct" name="product">
+              <option value="">None</option>
+            </select>
+          </div>
+          <div class="alert" id="galleryFormAlert"></div>
+          <div style="display:flex;gap:10px;">
+            <button type="submit" class="btn">Add Photo</button>
+            <button type="button" class="btn btn-outline" id="cancelGalleryFormBtn">Cancel</button>
+          </div>
+        </form>
+
+        <div class="data-table-wrap">
+          <table class="data-table">
+            <thead><tr><th>Photo</th><th>Caption</th><th>Linked Product</th><th>Actions</th></tr></thead>
+            <tbody id="galleryTableBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Orders -->
+      <section class="admin-panel" id="panelOrders">
+        <div class="panel-toolbar"><h3>Orders</h3></div>
+        <div class="data-table-wrap">
+          <table class="data-table">
+            <thead><tr><th>Order #</th><th>Customer</th><th>Items</th><th>Total</th><th>Payment</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead>
+            <tbody id="ordersTableBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Coupons -->
+      <section class="admin-panel" id="panelCoupons">
+        <div class="panel-toolbar">
+          <h3>Coupons</h3>
+          <button type="button" class="btn btn-sm" id="showAddCouponBtn">+ Add Coupon</button>
+        </div>
+
+        <form class="slide-form" id="couponForm">
+          <input type="hidden" name="couponId">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="couponCode">Code</label>
+              <input type="text" id="couponCode" name="code" required>
+            </div>
+            <div class="form-group">
+              <label for="couponType">Type</label>
+              <select id="couponType" name="type" required>
+                <option value="percent">Percent</option>
+                <option value="fixed">Fixed Amount</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="couponValue">Value</label>
+              <input type="number" step="0.01" min="0" id="couponValue" name="value" required>
+            </div>
+            <div class="form-group">
+              <label for="couponMinSubtotal">Min Subtotal</label>
+              <input type="number" step="0.01" min="0" id="couponMinSubtotal" name="minSubtotal" value="0">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="couponExpiresAt">Expires At (optional)</label>
+              <input type="date" id="couponExpiresAt" name="expiresAt">
+            </div>
+            <div class="form-group">
+              <label for="couponUsageLimit">Usage Limit (optional)</label>
+              <input type="number" min="0" id="couponUsageLimit" name="usageLimit">
+            </div>
+          </div>
+          <label class="checkbox-row"><input type="checkbox" name="isActive" id="couponActive" checked><span>Active</span></label>
+          <div class="alert" id="couponFormAlert"></div>
+          <div style="display:flex;gap:10px;">
+            <button type="submit" class="btn">Save Coupon</button>
+            <button type="button" class="btn btn-outline" id="cancelCouponFormBtn">Cancel</button>
+          </div>
+        </form>
+
+        <div class="data-table-wrap">
+          <table class="data-table">
+            <thead><tr><th>Code</th><th>Type</th><th>Value</th><th>Min Subtotal</th><th>Expires</th><th>Used</th><th>Active</th><th>Actions</th></tr></thead>
+            <tbody id="couponsTableBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Messages -->
+      <section class="admin-panel" id="panelMessages">
+        <div class="panel-toolbar"><h3>Contact Messages</h3></div>
+        <div class="data-table-wrap">
+          <table class="data-table">
+            <thead><tr><th>From</th><th>Subject</th><th>Message</th><th>Date</th><th>Read</th><th>Actions</th></tr></thead>
+            <tbody id="messagesTableBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- About Page -->
+      <section class="admin-panel" id="panelAbout">
+        <div class="panel-toolbar"><h3>About Page</h3></div>
+
+        <form id="aboutForm">
+          <div class="card" style="max-width:560px;">
+            <h4 style="margin-top:0;">Hero</h4>
+            <div class="form-group">
+              <label for="aboutHeroTitle">Heading</label>
+              <input type="text" id="aboutHeroTitle" name="aboutHeroTitle" required>
+            </div>
+            <div class="form-group">
+              <label for="aboutHeroSubtitle">Subheading</label>
+              <textarea id="aboutHeroSubtitle" name="aboutHeroSubtitle" required></textarea>
+            </div>
+          </div>
+
+          <div class="card" style="max-width:560px;">
+            <h4 style="margin-top:0;">Our Values</h4>
+            <div id="aboutValueRows"></div>
+            <button type="button" class="btn btn-sm btn-outline" id="addAboutValueRowBtn">+ Add Value</button>
+          </div>
+
+          <div class="alert" id="aboutFormAlert"></div>
+          <button type="submit" class="btn">Save About Page</button>
+        </form>
+      </section>
+
+      <!-- Settings -->
+      <section class="admin-panel" id="panelSettings">
+        <div class="panel-toolbar"><h3>Store Settings</h3></div>
+
+        <form id="settingsForm">
+          <div class="card" style="max-width:520px;">
+            <h4 style="margin-top:0;">Currency</h4>
+            <div class="form-group">
+              <label for="usdExchangeRate">USD exchange rate (PKR per $1)</label>
+              <input type="number" step="0.01" min="1" id="usdExchangeRate" name="usdExchangeRate" required>
+              <p style="font-size:0.78rem;color:var(--ink-soft);margin-top:6px;">Used to render an approximate USD price for visitors outside Pakistan. All order totals and bookkeeping stay in PKR.</p>
+            </div>
+          </div>
+
+          <div class="card" style="max-width:520px;">
+            <h4 style="margin-top:0;">Homepage Background</h4>
+            <div class="form-group">
+              <label for="heroMediaType">Display as</label>
+              <select id="heroMediaType" name="heroMediaType">
+                <option value="video">Video</option>
+                <option value="image">Picture</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="heroVideoFile">Background video (mp4, webm, or mov)</label>
+              <input type="file" id="heroVideoFile" name="heroVideo" accept="video/mp4,video/webm,video/quicktime">
+              <video id="heroVideoPreview" muted style="width:100%;max-height:160px;object-fit:cover;border-radius:var(--radius-sm);margin-top:8px;display:none;"></video>
+            </div>
+            <div class="form-group">
+              <label for="heroImageFile">Background picture</label>
+              <input type="file" id="heroImageFile" name="heroImage" accept="image/*">
+              <img id="heroImagePreview" alt="" style="width:100%;max-height:160px;object-fit:cover;border-radius:var(--radius-sm);margin-top:8px;display:none;">
+            </div>
+          </div>
+
+          <div class="card" style="max-width:520px;">
+            <h4 style="margin-top:0;">Homepage Banner</h4>
+            <label class="checkbox-row"><input type="checkbox" name="bannerEnabled" id="bannerEnabled"><span>Show banner on the homepage</span></label>
+            <div class="form-group" style="margin-top:14px;">
+              <label for="bannerText">Banner text</label>
+              <input type="text" id="bannerText" name="bannerText" maxlength="200" placeholder="e.g. Free shipping on orders over Rs 5,000">
+            </div>
+            <div class="form-group">
+              <label for="bannerLink">Banner link (optional)</label>
+              <input type="text" id="bannerLink" name="bannerLink" placeholder="/products.html?type=polish">
+            </div>
+          </div>
+
+          <div class="alert" id="settingsFormAlert"></div>
+          <button type="submit" class="btn">Save Settings</button>
+        </form>
+      </section>
+    </main>
+  </div>
+
+  <script src="/js/api.js"></script>
+  <script src="/admin/js/admin.js"></script>
+</body>
+</html>

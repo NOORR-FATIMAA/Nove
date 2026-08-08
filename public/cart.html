@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your Cart — Nove</title>
+  <link rel="icon" type="image/png" href="/img/logo.png">
+  <link rel="stylesheet" href="/css/style.css">
+  <script src="/js/theme.js"></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="/index.html" class="logo"><img src="/img/logo.png" alt="Nove" class="logo-img"></a>
+      <nav class="main-nav" id="mainNav">
+        <a href="/index.html">Home</a>
+        <a href="/products.html">Products</a>
+        <a href="/about.html">About</a>
+        <a href="/contact.html">Contact</a>
+      </nav>
+      <div class="header-actions">
+        <form class="nav-search" id="navSearchForm">
+          <input type="search" id="navSearchInput" placeholder="Search shades, sets...">
+        </form>
+        <a href="/wishlist.html" class="icon-link" aria-label="Wishlist">&#9825;<span class="badge" id="wishlistCount">0</span></a>
+        <a href="/cart.html" class="icon-link active" aria-label="Cart">&#128717;<span class="badge" id="cartCount">0</span></a>
+        <div id="themeToggle" class="theme-toggle"></div>
+        <div id="authArea"></div>
+        <button type="button" class="mobile-nav-toggle" id="mobileNavToggle" aria-label="Toggle menu" aria-expanded="false" aria-controls="mainNav">
+          <span class="bar"></span>
+          <span class="bar"></span>
+          <span class="bar"></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="section">
+    <div class="container">
+      <h1 class="section-title" style="text-align:left;">Your Cart</h1>
+
+      <div class="cart-layout">
+        <div>
+          <div id="cartItemsContainer"></div>
+          <div class="empty-state" id="cartEmptyState" style="display:none;">
+            <h3>Your cart is empty</h3>
+            <p>Looks like you haven't added anything to your cart yet.</p>
+            <a href="/products.html" class="btn">Continue Shopping</a>
+          </div>
+        </div>
+
+        <div class="summary-card" id="cartSummary" style="display:none;">
+          <h3>Order Summary</h3>
+          <div class="summary-row">
+            <span>Subtotal</span>
+            <span id="summarySubtotal">Rs 0</span>
+          </div>
+          <div class="summary-row" id="summaryDiscountRow" style="display:none;">
+            <span>Discount</span>
+            <span id="summaryDiscount">-Rs 0</span>
+          </div>
+          <p style="font-size:0.8rem;color:var(--ink-soft);">Shipping and final total are calculated at checkout.</p>
+
+          <form class="coupon-row" id="couponForm">
+            <input type="text" name="code" placeholder="Coupon code">
+            <button type="submit" class="btn btn-sm">Apply</button>
+          </form>
+          <div class="alert" id="couponMsg"></div>
+          <p id="appliedCouponNote" style="font-size:0.8rem;font-weight:600;color:var(--success);"></p>
+          <button type="button" class="btn btn-ghost btn-sm" id="removeCouponBtn" style="padding-left:0;">Remove coupon</button>
+
+          <div class="summary-row total">
+            <span>Estimated Total</span>
+            <span id="summaryTotal">Rs 0</span>
+          </div>
+
+          <a href="/checkout.html" class="btn btn-block">Proceed to Checkout</a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <h4>Nove</h4>
+          <p>Glossy press-on nails, polish, and nail art supplies for your at-home mani moment.</p>
+        </div>
+        <div>
+          <h4>Shop</h4>
+          <a href="/products.html?type=polish">Polish</a>
+          <a href="/products.html?type=press-ons">Press-Ons</a>
+          <a href="/products.html?type=nail-art-supplies">Nail Art Supplies</a>
+        </div>
+        <div>
+          <h4>Support</h4>
+          <a href="/about.html">About Us</a>
+          <a href="/contact.html">Contact</a>
+          <a href="/orders.html">Order Status</a>
+        </div>
+        <div>
+          <h4>Stay in the Loop</h4>
+          <p>Sign up for shade drops &amp; offers.</p>
+          <form class="newsletter-form" id="newsletterForm">
+            <input type="email" name="email" placeholder="you@email.com" required>
+            <button type="submit" class="btn btn-sm">Join</button>
+          </form>
+          <p id="newsletterMsg" style="font-size:0.8rem;margin-top:8px;"></p>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        &copy; 2026 Nove. All rights reserved.
+        <div id="currencyControl" class="currency-control"></div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/storage.js"></script>
+  <script src="/js/currency.js"></script>
+  <script src="/js/nav.js"></script>
+  <script src="/js/cart.js"></script>
+  <script src="/js/animations.js"></script>
+</body>
+</html>

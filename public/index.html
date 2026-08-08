@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nove — Press-On Nails, Polish & Nail Art</title>
+  <meta name="description" content="Nove is a nail products shop for press-on nails, polish, and nail art supplies.">
+  <link rel="icon" type="image/png" href="/img/logo.png">
+  <link rel="stylesheet" href="/css/style.css">
+  <script src="/js/theme.js"></script>
+</head>
+<body>
+  <div id="promoBanner" class="promo-banner"></div>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="/index.html" class="logo"><img src="/img/logo.png" alt="Nove" class="logo-img"></a>
+      <nav class="main-nav" id="mainNav">
+        <a href="/index.html">Home</a>
+        <a href="/products.html">Products</a>
+        <a href="/about.html">About</a>
+        <a href="/contact.html">Contact</a>
+      </nav>
+      <div class="header-actions">
+        <form class="nav-search" id="navSearchForm">
+          <input type="search" id="navSearchInput" placeholder="Search shades, sets...">
+        </form>
+        <a href="/wishlist.html" class="icon-link" aria-label="Wishlist">&#9825;<span class="badge" id="wishlistCount">0</span></a>
+        <a href="/cart.html" class="icon-link" aria-label="Cart">&#128717;<span class="badge" id="cartCount">0</span></a>
+        <div id="themeToggle" class="theme-toggle"></div>
+        <div id="authArea"></div>
+        <button type="button" class="mobile-nav-toggle" id="mobileNavToggle" aria-label="Toggle menu" aria-expanded="false" aria-controls="mainNav">
+          <span class="bar"></span>
+          <span class="bar"></span>
+          <span class="bar"></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="hero-video-bg">
+        <video
+          id="heroVideoEl"
+          class="hero-video"
+          data-parallax
+          data-parallax-speed="0.15"
+          autoplay
+          muted
+          loop
+          playsinline
+          poster="/img/hero-visual.svg"
+        >
+          <source src="/videos/hero-fullscreen.mp4" type="video/mp4">
+        </video>
+        <img
+          id="heroImageEl"
+          class="hero-video"
+          data-parallax
+          data-parallax-speed="0.15"
+          alt="Nove hero"
+          style="display:none;"
+        >
+        <div class="hero-video-overlay"></div>
+      </div>
+      <div class="container hero-inner">
+        <div class="hero-copy" data-parallax data-parallax-speed="-0.06">
+          <span class="eyebrow">New Season, New Nails</span>
+          <h1>Glossy nails, done at home.</h1>
+          <p>Salon-quality press-on nails, long-wear polish, and nail art supplies — designed to make every manicure feel like a moment.</p>
+          <div class="hero-actions">
+            <a href="/products.html" class="btn">Shop All</a>
+            <a href="/products.html?type=press-ons" class="btn btn-outline">Shop Press-Ons</a>
+          </div>
+        </div>
+      </div>
+      <span class="hero-scroll-cue" aria-hidden="true"></span>
+    </section>
+
+    <section class="section" id="offersSection" style="display:none;">
+      <div class="container">
+        <h2 class="section-title reveal">Special Offers</h2>
+        <p class="section-subtitle">Limited-time deals — while they last.</p>
+        <div class="offers-grid" id="offersGrid"></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <h2 class="section-title reveal">Shop by Category</h2>
+        <p class="section-subtitle">From everyday polish to statement press-ons and the tools to make it art.</p>
+        <div class="category-grid" id="categoryGrid"></div>
+      </div>
+    </section>
+
+    <section class="section" style="background: var(--cream-dark);">
+      <div class="container">
+        <h2 class="section-title reveal">Featured Favorites</h2>
+        <p class="section-subtitle">The shades and sets our customers keep coming back for.</p>
+        <div class="product-grid" id="featuredGrid"></div>
+      </div>
+    </section>
+
+    <section class="parallax-banner">
+      <div class="parallax-banner-media">
+        <img
+          src="/img/moodboard-nailart-2.png"
+          alt="Hand-painted nail art in progress, sketched shade-by-shade before becoming a full Nove set"
+          class="parallax-banner-img"
+          data-parallax
+          data-parallax-speed="0.2"
+        >
+      </div>
+      <div class="parallax-banner-overlay"></div>
+      <div class="container parallax-banner-content reveal">
+        <span class="eyebrow">Behind the Brand</span>
+        <h2>Hand-painted, one nail at a time.</h2>
+        <p>Every Nove design starts as a sketch on a single nail before it becomes a full collection — real art, made by real hands.</p>
+        <a href="/about.html" class="btn btn-outline">Our Story</a>
+      </div>
+    </section>
+
+    <section class="section" id="bundlesSection">
+      <div class="container">
+        <h2 class="section-title reveal">Curated Sets</h2>
+        <p class="section-subtitle">Save when you shop the shades and sets that go together.</p>
+        <div class="product-grid" id="bundlesGrid"></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container feature-split">
+        <div class="feature-split-media">
+          <img
+            src="/img/feature-nailart.png"
+            alt="Close-up of finished blue and silver press-on nail art"
+            class="feature-split-img"
+            data-parallax
+            data-parallax-speed="0.1"
+          >
+        </div>
+        <div class="feature-split-copy reveal">
+          <span class="eyebrow">Crafted to Last</span>
+          <h2>Salon finish, zero salon wait.</h2>
+          <p>Every set is hand-designed and quality-checked before it ships, so what you see is exactly what arrives — glossy, precise, and ready to wear the moment you open the box.</p>
+          <a href="/products.html?type=press-ons" class="btn">Shop Press-Ons</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="gallerySection" style="background: var(--cream-dark);">
+      <div class="container">
+        <h2 class="section-title reveal">Styled by Our Community</h2>
+        <p class="section-subtitle">Real Nove looks from real customers. Tag us to be featured.</p>
+        <div class="gallery-masonry" id="galleryGrid"></div>
+      </div>
+    </section>
+
+    <section class="section quiz-cta reveal">
+      <div class="quiz-cta-inner">
+        <div>
+          <h2>Not sure where to start?</h2>
+          <p>Take our 30-second Shade &amp; Size Finder and we'll point you to your matches.</p>
+        </div>
+        <button type="button" class="btn" id="quizTrigger">Find My Match</button>
+      </div>
+    </section>
+  </main>
+
+  <div class="modal-overlay" id="quizModal">
+    <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="quizTitle">
+      <button type="button" class="modal-close" id="quizCloseBtn" aria-label="Close">&times;</button>
+      <h2 id="quizTitle">Shade &amp; Size Finder</h2>
+      <form id="quizForm">
+        <div class="form-group">
+          <label>What are you shopping for?</label>
+          <div class="filter-group">
+            <label class="filter-option"><input type="radio" name="quizType" value="polish"> Polish</label>
+            <label class="filter-option"><input type="radio" name="quizType" value="press-ons"> Press-Ons</label>
+            <label class="filter-option"><input type="radio" name="quizType" value="nail-art-supplies"> Nail Art Supplies</label>
+            <label class="filter-option"><input type="radio" name="quizType" value="" checked> Show me everything</label>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>What's your vibe?</label>
+          <div class="filter-group">
+            <label class="filter-option"><input type="radio" name="quizVibe" value="glossy"> Glossy &amp; classic</label>
+            <label class="filter-option"><input type="radio" name="quizVibe" value="matte"> Matte &amp; moody</label>
+            <label class="filter-option"><input type="radio" name="quizVibe" value="shimmer"> Shimmer &amp; sparkle</label>
+            <label class="filter-option"><input type="radio" name="quizVibe" value="" checked> Doesn't matter</label>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>What's your budget?</label>
+          <div class="filter-group">
+            <label class="filter-option"><input type="radio" name="quizBudget" value="0-1000"> Under Rs 1,000</label>
+            <label class="filter-option"><input type="radio" name="quizBudget" value="1000-2500"> Rs 1,000&ndash;2,500</label>
+            <label class="filter-option"><input type="radio" name="quizBudget" value="2500-"> Rs 2,500+</label>
+            <label class="filter-option"><input type="radio" name="quizBudget" value="" checked> No preference</label>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Want it in stock right now?</label>
+          <div class="filter-group">
+            <label class="filter-option"><input type="radio" name="quizStock" value="true"> Yes, ready to ship</label>
+            <label class="filter-option"><input type="radio" name="quizStock" value="" checked> I don't mind waiting</label>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-block">See My Matches</button>
+      </form>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <h4>Nove</h4>
+          <p>Glossy press-on nails, polish, and nail art supplies for your at-home mani moment.</p>
+        </div>
+        <div>
+          <h4>Shop</h4>
+          <a href="/products.html?type=polish">Polish</a>
+          <a href="/products.html?type=press-ons">Press-Ons</a>
+          <a href="/products.html?type=nail-art-supplies">Nail Art Supplies</a>
+        </div>
+        <div>
+          <h4>Support</h4>
+          <a href="/about.html">About Us</a>
+          <a href="/contact.html">Contact</a>
+          <a href="/orders.html">Order Status</a>
+        </div>
+        <div>
+          <h4>Stay in the Loop</h4>
+          <p>Sign up for shade drops &amp; offers.</p>
+          <form class="newsletter-form" id="newsletterForm">
+            <input type="email" name="email" placeholder="you@email.com" required>
+            <button type="submit" class="btn btn-sm">Join</button>
+          </form>
+          <p id="newsletterMsg" style="font-size:0.8rem;margin-top:8px;"></p>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        &copy; 2026 Nove. All rights reserved.
+        <div id="currencyControl" class="currency-control"></div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/storage.js"></script>
+  <script src="/js/currency.js"></script>
+  <script src="/js/nav.js"></script>
+  <script src="/js/cart.js"></script>
+  <script src="/js/products.js"></script>
+  <script src="/js/bundles.js"></script>
+  <script src="/js/offers.js"></script>
+  <script src="/js/gallery.js"></script>
+  <script src="/js/quiz.js"></script>
+  <script src="/js/home-content.js"></script>
+  <script src="/js/animations.js"></script>
+</body>
+</html>

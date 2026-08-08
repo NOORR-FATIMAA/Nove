@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Account — Nove</title>
+  <link rel="icon" type="image/png" href="/img/logo.png">
+  <link rel="stylesheet" href="/css/style.css">
+  <script src="/js/theme.js"></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="/index.html" class="logo"><img src="/img/logo.png" alt="Nove" class="logo-img"></a>
+      <nav class="main-nav" id="mainNav">
+        <a href="/index.html">Home</a>
+        <a href="/products.html">Products</a>
+        <a href="/about.html">About</a>
+        <a href="/contact.html">Contact</a>
+      </nav>
+      <div class="header-actions">
+        <a href="/wishlist.html" class="icon-link" aria-label="Wishlist">&#9825;<span class="badge" id="wishlistCount">0</span></a>
+        <a href="/cart.html" class="icon-link" aria-label="Cart">&#128717;<span class="badge" id="cartCount">0</span></a>
+        <div id="themeToggle" class="theme-toggle"></div>
+        <div id="authArea"></div>
+        <button type="button" class="mobile-nav-toggle" id="mobileNavToggle" aria-label="Toggle menu" aria-expanded="false" aria-controls="mainNav">
+          <span class="bar"></span>
+          <span class="bar"></span>
+          <span class="bar"></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="section">
+    <div class="container" id="accountRoot">
+      <h1 class="section-title" style="text-align:left;">My Account</h1>
+
+      <div class="account-layout">
+        <nav class="account-nav">
+          <a href="#" data-tab-target="tabProfile" class="active">Profile</a>
+          <a href="#" data-tab-target="tabAddresses">Addresses</a>
+          <a href="#" data-tab-target="tabPassword">Change Password</a>
+          <a href="/orders.html">Order History</a>
+        </nav>
+
+        <div>
+          <div class="account-panel active" id="tabProfile">
+            <div class="card reveal" id="loyaltyCard">
+              <h3>Loyalty Points</h3>
+              <p>You have <strong id="loyaltyPointsBalance">0</strong> points, worth <span id="loyaltyPointsValue">Rs 0</span> toward your next order.</p>
+              <p style="font-size:0.82rem;color:var(--ink-soft);">Earn 1 point for every Rs 100 spent once your order is delivered. Redeem points at checkout.</p>
+            </div>
+
+            <div class="card reveal">
+              <h3>Profile Details</h3>
+              <div class="alert" id="profileAlert"></div>
+              <form id="profileForm">
+                <div class="form-group">
+                  <label for="name">Full Name</label>
+                  <input type="text" id="name" name="name" required>
+                </div>
+                <div class="form-group">
+                  <label for="email">Email</label>
+                  <input type="email" id="email" name="email" disabled>
+                </div>
+                <div class="form-group">
+                  <label for="phone">Phone</label>
+                  <input type="tel" id="phone" name="phone">
+                </div>
+                <button type="submit" class="btn">Save Changes</button>
+              </form>
+            </div>
+          </div>
+
+          <div class="account-panel" id="tabAddresses">
+            <div class="card reveal">
+              <h3>Saved Addresses</h3>
+              <div id="addressList"></div>
+            </div>
+            <div class="card reveal">
+              <h3>Add New Address</h3>
+              <div class="alert" id="addAddressAlert"></div>
+              <form id="addAddressForm">
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="label">Label</label>
+                    <input type="text" id="label" name="label" placeholder="Home, Work...">
+                  </div>
+                  <div class="form-group">
+                    <label for="fullName">Full Name</label>
+                    <input type="text" id="fullName" name="fullName" required>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="phone2">Phone</label>
+                  <input type="tel" id="phone2" name="phone" required>
+                </div>
+                <div class="form-group">
+                  <label for="line1">Address Line 1</label>
+                  <input type="text" id="line1" name="line1" required>
+                </div>
+                <div class="form-group">
+                  <label for="line2">Address Line 2</label>
+                  <input type="text" id="line2" name="line2">
+                </div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="city">City</label>
+                    <input type="text" id="city" name="city" required>
+                  </div>
+                  <div class="form-group">
+                    <label for="state">State</label>
+                    <input type="text" id="state" name="state">
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="postalCode">Postal Code</label>
+                    <input type="text" id="postalCode" name="postalCode" required>
+                  </div>
+                  <div class="form-group">
+                    <label for="country">Country</label>
+                    <input type="text" id="country" name="country" required value="Pakistan">
+                  </div>
+                </div>
+                <label class="checkbox-row">
+                  <input type="checkbox" name="isDefault" id="isDefault">
+                  <span>Set as default address</span>
+                </label>
+                <button type="submit" class="btn" style="margin-top:14px;">Add Address</button>
+              </form>
+            </div>
+          </div>
+
+          <div class="account-panel" id="tabPassword">
+            <div class="card reveal">
+              <h3>Change Password</h3>
+              <div class="alert" id="passwordAlert"></div>
+              <form id="changePasswordForm">
+                <div class="form-group">
+                  <label for="currentPassword">Current Password</label>
+                  <input type="password" id="currentPassword" name="currentPassword" required>
+                </div>
+                <div class="form-group">
+                  <label for="newPassword">New Password</label>
+                  <input type="password" id="newPassword" name="newPassword" minlength="8" required>
+                </div>
+                <div class="form-group">
+                  <label for="confirmNewPassword">Confirm New Password</label>
+                  <input type="password" id="confirmNewPassword" name="confirmNewPassword" minlength="8" required>
+                </div>
+                <button type="submit" class="btn">Update Password</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-bottom">
+        &copy; 2026 Nove. All rights reserved.
+        <div id="currencyControl" class="currency-control"></div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/storage.js"></script>
+  <script src="/js/currency.js"></script>
+  <script src="/js/nav.js"></script>
+  <script src="/js/account.js"></script>
+  <script src="/js/animations.js"></script>
+</body>
+</html>
