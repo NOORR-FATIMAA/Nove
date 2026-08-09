@@ -65,7 +65,8 @@
       <section class="admin-panel" id="panelProducts">
         <div class="panel-toolbar">
           <h3>Products</h3>
-          <div style="display:flex;gap:8px;">
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button type="button" class="btn btn-sm btn-danger" id="bulkDeleteProductsBtn" style="display:none;">🗑 Delete Selected (<span id="bulkDeleteCount">0</span>)</button>
             <button type="button" class="btn btn-sm btn-outline" id="goToBannerSettingsBtn">📢 Set Homepage Banner</button>
             <button type="button" class="btn btn-sm" id="showAddProductBtn">+ Add Product</button>
           </div>
@@ -163,7 +164,7 @@
 
         <div class="data-table-wrap">
           <table class="data-table">
-            <thead><tr><th>Image</th><th>Name</th><th>SKU</th><th>Category</th><th>Price</th><th>Stock</th><th>Active</th><th>Actions</th></tr></thead>
+            <thead><tr><th><input type="checkbox" id="selectAllProductsCheckbox" aria-label="Select all products"></th><th>Image</th><th>Name</th><th>SKU</th><th>Category</th><th>Price</th><th>Stock</th><th>Active</th><th>Actions</th></tr></thead>
             <tbody id="productsTableBody"></tbody>
           </table>
         </div>

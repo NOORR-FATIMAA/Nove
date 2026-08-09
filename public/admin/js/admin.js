@@ -1,6 +1,7 @@
 // Nove Admin Panel — single page, tab-based, all mutations against /api/*.
 
 let categoriesCache = [];
+const selectedProductIds = new Set();
 
 async function requireAdmin() {
   try {
@@ -86,7 +87,12 @@ function categoryName(id) {
 
 async function loadProducts() {
   const tbody = document.getElementById('productsTableBody');
-  tbody.innerHTML = '<tr><td colspan="8">Loading...</td></tr>';
+  tbody.innerHTML = '<tr><td colspan="9">Loading...</td></tr>';
+
+  selectedProductIds.clear();
+  updateBulkDeleteUI();
+  const selectAll = document.getElementById('selectAllProductsCheckbox');
+  if (selectAll) selectAll.checked = false;
 
   const res = await api.get('/products?limit=100&sort=-createdAt');
   if (categoriesCache.length === 0) await populateCategorySelect();
@@ -97,6 +103,7 @@ async function loadProducts() {
       const catName = p.category && p.category.name ? p.category.name : '';
       return `
         <tr data-id="${p._id}">
+          <td><input type="checkbox" class="row-select-checkbox" data-id="${p._id}" aria-label="Select ${escapeHtml(p.name)}"></td>
           <td><img class="thumb" src="${escapeHtml(img)}" alt=""></td>
           <td>${escapeHtml(p.name)}</td>
           <td>${escapeHtml(p.sku)}</td>
@@ -137,6 +144,64 @@ async function loadProducts() {
       await api.delete(`/products/${id}`);
       loadProducts();
     });
+  });
+}
+
+function updateBulkDeleteUI() {
+  const btn = document.getElementById('bulkDeleteProductsBtn');
+  const countEl = document.getElementById('bulkDeleteCount');
+  if (!btn || !countEl) return;
+  countEl.textContent = selectedProductIds.size;
+  btn.style.display = selectedProductIds.size > 0 ? 'inline-flex' : 'none';
+}
+
+// Wired once at init, not per-render: the per-row checkboxes are recreated on
+// every loadProducts() call, so this uses event delegation on the (stable)
+// tbody element instead of rebinding a listener to each new checkbox.
+function wireBulkDeleteProducts() {
+  const selectAll = document.getElementById('selectAllProductsCheckbox');
+  const bulkBtn = document.getElementById('bulkDeleteProductsBtn');
+  const tbody = document.getElementById('productsTableBody');
+  if (!selectAll || !bulkBtn || !tbody) return;
+
+  selectAll.addEventListener('change', () => {
+    tbody.querySelectorAll('.row-select-checkbox').forEach((cb) => {
+      cb.checked = selectAll.checked;
+      if (selectAll.checked) selectedProductIds.add(cb.dataset.id);
+      else selectedProductIds.delete(cb.dataset.id);
+    });
+    updateBulkDeleteUI();
+  });
+
+  tbody.addEventListener('change', (e) => {
+    if (!e.target.classList.contains('row-select-checkbox')) return;
+    if (e.target.checked) selectedProductIds.add(e.target.dataset.id);
+    else selectedProductIds.delete(e.target.dataset.id);
+
+    const rowCheckboxes = tbody.querySelectorAll('.row-select-checkbox');
+    selectAll.checked = rowCheckboxes.length > 0 && [...rowCheckboxes].every((cb) => cb.checked);
+    updateBulkDeleteUI();
+  });
+
+  bulkBtn.addEventListener('click', async () => {
+    const ids = [...selectedProductIds];
+    if (ids.length === 0) return;
+    if (!confirm(`Delete ${ids.length} selected product${ids.length === 1 ? '' : 's'}? This can't be undone.`)) return;
+
+    bulkBtn.disabled = true;
+    let failed = 0;
+    for (const id of ids) {
+      try {
+        // eslint-disable-next-line no-await-in-loop
+        await api.delete(`/products/${id}`);
+      } catch (err) {
+        failed += 1;
+      }
+    }
+    bulkBtn.disabled = false;
+
+    if (failed > 0) alert(`${failed} of ${ids.length} product(s) could not be deleted.`);
+    loadProducts();
   });
 }
 
@@ -1121,6 +1186,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   wireSidebarNav();
   wireProductForm();
+  wireBulkDeleteProducts();
   wireCategoryForm();
   wireBundleForm();
   wireOfferForm();
