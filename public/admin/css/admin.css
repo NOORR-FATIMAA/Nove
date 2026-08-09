@@ -90,6 +90,49 @@ body.admin-body {
   margin-bottom: 26px;
 }
 
+/* Off-canvas sidebar toggle + backdrop — hidden on desktop, shown at
+   ≤900px (see media query below), same interaction pattern as the
+   storefront's mobile nav drawer. */
+.admin-sidebar-toggle {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  width: 40px;
+  height: 40px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.admin-sidebar-toggle .bar {
+  display: block;
+  width: 22px;
+  height: 2px;
+  background: var(--ink);
+  border-radius: 2px;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.admin-sidebar-toggle[aria-expanded='true'] .bar:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+
+.admin-sidebar-toggle[aria-expanded='true'] .bar:nth-child(2) {
+  opacity: 0;
+}
+
+.admin-sidebar-toggle[aria-expanded='true'] .bar:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+.admin-sidebar-overlay {
+  display: none;
+}
+
 .admin-panel {
   display: none;
 }
@@ -242,51 +285,53 @@ table.data-table img.thumb {
 
 @media (max-width: 900px) {
   .admin-shell {
-    grid-template-columns: 1fr;
+    display: block; /* stop grid-stretching rows now that the sidebar is fixed */
+    min-height: 100vh;
   }
 
-  /* Logo + logout share a compact top line; nav becomes its own horizontally
-     scrollable strip below instead of all three mixed into one long row
-     (which pushed logout off-screen and made the logo eat scroll space). */
+  /* Off-canvas drawer instead of a squeezed inline column — same pattern as
+     the storefront's mobile nav. Toggled via #adminSidebarToggle in admin.js. */
   .admin-sidebar {
-    flex-direction: row;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    padding: 14px 16px;
-    gap: 8px 14px;
+    position: fixed;
+    inset: 0 auto 0 0;
+    width: 240px;
+    max-width: 82vw;
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+    z-index: 200;
+    flex-direction: column;
+    overflow-x: visible;
+    overflow-y: auto;
   }
-  .admin-sidebar .logo {
-    order: 1;
-    margin-bottom: 0;
-    font-size: 1.15rem;
-  }
-  .admin-sidebar .logout-btn {
-    order: 2;
-    margin-top: 0;
-    padding: 8px 12px;
-    font-size: 0.8rem;
+  .admin-sidebar.open {
+    transform: translateX(0);
   }
   .admin-nav {
-    order: 3;
-    flex: 1 1 100%;
-    flex-direction: row;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    padding-bottom: 2px;
-  }
-  .admin-nav button {
-    flex-shrink: 0;
-    padding: 8px 12px;
-    font-size: 0.82rem;
-    white-space: nowrap;
+    flex-direction: column;
   }
 
-  .stat-grid {
-    grid-template-columns: 1fr 1fr;
+  .admin-sidebar-overlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(58, 44, 48, 0.5);
+    z-index: 199;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
   }
+  .admin-sidebar-overlay.open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .admin-sidebar-toggle {
+    display: flex;
+  }
+
   .admin-main {
     padding: 20px 16px;
+    max-width: 100%;
   }
   .admin-topbar {
     flex-wrap: wrap;
@@ -296,9 +341,20 @@ table.data-table img.thumb {
     font-size: 1.3rem;
   }
 
+  .stat-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
   table.data-table th,
   table.data-table td {
     padding: 10px 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .admin-sidebar,
+  .admin-sidebar-overlay {
+    transition: none;
   }
 }
 

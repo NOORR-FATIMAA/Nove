@@ -21,6 +21,7 @@ function wireSidebarNav() {
       document.querySelectorAll('.admin-panel').forEach((p) => p.classList.remove('active'));
       btn.classList.add('active');
       document.getElementById(btn.dataset.panel).classList.add('active');
+      closeAdminSidebar();
 
       if (btn.dataset.panel === 'panelProducts') loadProducts();
       if (btn.dataset.panel === 'panelCategories') loadCategories();
@@ -38,6 +39,49 @@ function wireSidebarNav() {
   document.getElementById('adminLogoutBtn').addEventListener('click', async () => {
     await api.post('/auth/logout');
     window.location.href = '/admin/login.html';
+  });
+}
+
+// Off-canvas sidebar (≤900px) — same interaction shape as the storefront's
+// mobile nav drawer: toggle button, backdrop click, and Escape all close it.
+// closeAdminSidebar() is also called from wireSidebarNav() above so picking
+// a panel on mobile doesn't leave the drawer open over the new content; it's
+// a harmless no-op above 900px since the classes it touches aren't styled there.
+function closeAdminSidebar() {
+  const sidebar = document.getElementById('adminSidebar');
+  const overlay = document.getElementById('adminSidebarOverlay');
+  const toggle = document.getElementById('adminSidebarToggle');
+  if (!sidebar || !overlay || !toggle) return;
+  sidebar.classList.remove('open');
+  overlay.classList.remove('open');
+  toggle.setAttribute('aria-expanded', 'false');
+}
+
+function wireAdminSidebarToggle() {
+  const toggle = document.getElementById('adminSidebarToggle');
+  const sidebar = document.getElementById('adminSidebar');
+  const overlay = document.getElementById('adminSidebarOverlay');
+  if (!toggle || !sidebar || !overlay) return;
+
+  function openSidebar() {
+    sidebar.classList.add('open');
+    overlay.classList.add('open');
+    toggle.setAttribute('aria-expanded', 'true');
+  }
+
+  toggle.addEventListener('click', () => {
+    if (sidebar.classList.contains('open')) closeAdminSidebar();
+    else openSidebar();
+  });
+
+  overlay.addEventListener('click', closeAdminSidebar);
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && sidebar.classList.contains('open')) closeAdminSidebar();
+  });
+
+  window.addEventListener('resize', () => {
+    if (window.innerWidth > 900) closeAdminSidebar();
   });
 }
 
@@ -1185,6 +1229,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('adminGreeting').textContent = `Welcome back, ${user.name.split(' ')[0]}`;
 
   wireSidebarNav();
+  wireAdminSidebarToggle();
   wireProductForm();
   wireBulkDeleteProducts();
   wireCategoryForm();
