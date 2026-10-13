@@ -404,25 +404,106 @@ async function renderSwatches(product) {
   container.innerHTML = html;
 }
 
+// Main image + thumbnails, with a tap-to-zoom lightbox and touch-swipe
+// support on the main image. All interaction funnels through showImage() so
+// thumbs, swipe, and the lightbox's prev/next always stay in sync.
 function renderGallery(product) {
+  const mainWrap = document.getElementById('galleryMainWrap');
   const mainImg = document.getElementById('galleryMainImg');
   const thumbs = document.getElementById('galleryThumbs');
+  const zoomBtn = document.getElementById('galleryZoomBtn');
+  const lightbox = document.getElementById('lightboxModal');
+  const lightboxImg = document.getElementById('lightboxImg');
+  const lightboxPrevBtn = document.getElementById('lightboxPrevBtn');
+  const lightboxNextBtn = document.getElementById('lightboxNextBtn');
+  const lightboxCloseBtn = document.getElementById('lightboxCloseBtn');
   const images = product.images && product.images.length ? product.images : ['/img/placeholder.svg'];
+  let currentIndex = 0;
 
-  mainImg.src = images[0];
-  mainImg.alt = product.name;
+  function showImage(idx) {
+    currentIndex = ((idx % images.length) + images.length) % images.length;
+    mainImg.src = images[currentIndex];
+    mainImg.alt = product.name;
+    thumbs.querySelectorAll('img').forEach((t) => t.classList.toggle('active', Number(t.dataset.idx) === currentIndex));
+    if (lightbox && lightbox.classList.contains('open')) {
+      lightboxImg.src = images[currentIndex];
+      lightboxImg.alt = product.name;
+    }
+  }
 
   thumbs.innerHTML = images
-    .map((img, idx) => `<img src="${escapeHtml(img)}" data-idx="${idx}" class="${idx === 0 ? 'active' : ''}">`)
+    .map((img, idx) => `<img src="${escapeHtml(img)}" data-idx="${idx}" alt="${escapeHtml(product.name)} — view ${idx + 1}">`)
     .join('');
-
   thumbs.querySelectorAll('img').forEach((thumb) => {
-    thumb.addEventListener('click', () => {
-      mainImg.src = images[thumb.dataset.idx];
-      thumbs.querySelectorAll('img').forEach((t) => t.classList.remove('active'));
-      thumb.classList.add('active');
-    });
+    thumb.addEventListener('click', () => showImage(Number(thumb.dataset.idx)));
   });
+
+  showImage(0);
+
+  if (images.length <= 1) {
+    if (lightboxPrevBtn) lightboxPrevBtn.style.display = 'none';
+    if (lightboxNextBtn) lightboxNextBtn.style.display = 'none';
+  }
+
+  if (lightbox) {
+    function handleLightboxKeydown(e) {
+      if (e.key === 'Escape') closeLightbox();
+      if (e.key === 'ArrowLeft') showImage(currentIndex - 1);
+      if (e.key === 'ArrowRight') showImage(currentIndex + 1);
+    }
+
+    function openLightbox() {
+      lightboxImg.src = images[currentIndex];
+      lightboxImg.alt = product.name;
+      lightbox.classList.add('open');
+      document.addEventListener('keydown', handleLightboxKeydown);
+      if (lightboxCloseBtn) lightboxCloseBtn.focus();
+    }
+
+    function closeLightbox() {
+      lightbox.classList.remove('open');
+      document.removeEventListener('keydown', handleLightboxKeydown);
+    }
+
+    let swiped = false;
+    let touchStartX = null;
+    if (mainWrap) {
+      mainWrap.addEventListener('touchstart', (e) => {
+        touchStartX = e.touches[0].clientX;
+        swiped = false;
+      }, { passive: true });
+      mainWrap.addEventListener('touchmove', (e) => {
+        if (touchStartX == null) return;
+        if (Math.abs(e.touches[0].clientX - touchStartX) > 10) swiped = true;
+      }, { passive: true });
+      mainWrap.addEventListener('touchend', (e) => {
+        if (touchStartX == null) return;
+        const dx = e.changedTouches[0].clientX - touchStartX;
+        if (Math.abs(dx) > 40) showImage(currentIndex + (dx < 0 ? 1 : -1));
+        touchStartX = null;
+      }, { passive: true });
+      mainWrap.addEventListener('click', () => {
+        if (swiped) {
+          swiped = false;
+          return;
+        }
+        openLightbox();
+      });
+    }
+
+    if (zoomBtn) {
+      zoomBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        openLightbox();
+      });
+    }
+    if (lightboxCloseBtn) lightboxCloseBtn.addEventListener('click', closeLightbox);
+    lightbox.addEventListener('click', (e) => {
+      if (e.target === lightbox) closeLightbox();
+    });
+    if (lightboxPrevBtn) lightboxPrevBtn.addEventListener('click', () => showImage(currentIndex - 1));
+    if (lightboxNextBtn) lightboxNextBtn.addEventListener('click', () => showImage(currentIndex + 1));
+  }
 }
 
 function renderReviews(reviews) {
@@ -489,15 +570,225 @@ function wireSizeGuide(product) {
   }
 }
 
-function wireTabs() {
-  document.querySelectorAll('.tab-btn').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.tab-btn').forEach((b) => b.classList.remove('active'));
-      document.querySelectorAll('.tab-panel').forEach((p) => p.classList.remove('active'));
-      btn.classList.add('active');
-      document.getElementById(btn.dataset.tabTarget).classList.add('active');
+// Expandable info sections (description, specs, shipping, FAQs, reviews).
+// Each header toggles its own panel independently — several can stay open.
+function wireAccordion() {
+  document.querySelectorAll('#detailAccordion .accordion-header').forEach((header) => {
+    header.addEventListener('click', () => {
+      const item = header.closest('.accordion-item');
+      const isOpen = item.classList.toggle('open');
+      header.setAttribute('aria-expanded', String(isOpen));
     });
   });
+}
+
+const APPLICATION_CARE_CONTENT = {
+  polish: {
+    heading: 'Applying your polish',
+    steps: [
+      'Shake the bottle well, then apply a thin base coat and let it set.',
+      'Apply two thin coats of color, letting each one set before the next.',
+      'Finish with a top coat to seal and add shine.',
+    ],
+    care: 'Store the bottle upright in a cool, dry place out of direct sunlight, and wipe the neck before closing so the cap doesn\'t stick.',
+  },
+  'press-ons': {
+    heading: 'Applying your press-ons',
+    steps: [
+      'Push back cuticles and lightly buff the natural nail surface for grip.',
+      'Use the Size &amp; Fit Guide to pick the closest-fitting nail for each finger.',
+      'Apply adhesive and press each nail firmly in place for 10–20 seconds.',
+      'File the edges lightly to finish your shape.',
+    ],
+    care: 'Store any unused nails flat in their original packaging, away from direct sunlight and heat. To remove, soak in warm water to loosen the adhesive rather than peeling the nail off dry.',
+  },
+  'nail-art-supplies': {
+    heading: 'Using this set',
+    steps: ['See the product description above for how this item is used.'],
+    care: 'Store in a cool, dry place, and keep small tools and decals away from children.',
+  },
+};
+
+function renderApplicationCare(product) {
+  const container = document.getElementById('applicationCareContent');
+  if (!container) return;
+  const type = product.attributes && product.attributes.type;
+  const content = APPLICATION_CARE_CONTENT[type];
+
+  if (!content) {
+    container.innerHTML = '';
+    return;
+  }
+
+  container.innerHTML = `
+    <h4>${escapeHtml(content.heading)}</h4>
+    <ol class="size-guide-steps">
+      ${content.steps.map((step) => `<li>${step}</li>`).join('')}
+    </ol>
+    <p>${content.care}</p>
+  `;
+}
+
+function renderProductSpecs(product) {
+  const item = document.getElementById('productSpecsItem');
+  const list = document.getElementById('productSpecsList');
+  if (!item || !list) return;
+
+  const attrs = product.attributes || {};
+  const rows = [];
+  if (product.category && product.category.name) rows.push(['Category', product.category.name]);
+  if (attrs.shade) rows.push(['Shade', attrs.shade]);
+  if (attrs.finish) rows.push(['Finish', attrs.finish]);
+  if (attrs.size) rows.push(['Size', attrs.size]);
+
+  if (rows.length === 0) {
+    item.style.display = 'none';
+    return;
+  }
+
+  item.style.display = '';
+  list.innerHTML = rows
+    .map(([label, value]) => `<dt>${escapeHtml(label)}</dt><dd>${escapeHtml(value)}</dd>`)
+    .join('');
+}
+
+async function renderShippingFacts() {
+  const feeEl = document.getElementById('shipFeeAmount');
+  const thresholdEl = document.getElementById('freeShipThreshold');
+  if (window.currencyReady) await window.currencyReady;
+  if (feeEl) feeEl.textContent = formatMoney(200);
+  if (thresholdEl) thresholdEl.textContent = formatMoney(5000);
+}
+
+function renderBreadcrumb(product) {
+  const nav = document.getElementById('detailBreadcrumb');
+  if (!nav) return;
+  const categoryName = product.category && product.category.name ? product.category.name : '';
+  const categoryId = product.category && product.category._id ? product.category._id : '';
+  nav.innerHTML = `
+    <a href="/index.html">Home</a>
+    <span aria-hidden="true">/</span>
+    <a href="/products.html">Shop</a>
+    ${
+      categoryName
+        ? `<span aria-hidden="true">/</span><a href="/products.html?category=${encodeURIComponent(categoryId)}">${escapeHtml(categoryName)}</a>`
+        : ''
+    }
+    <span aria-hidden="true">/</span>
+    <span>${escapeHtml(product.name)}</span>
+  `;
+}
+
+// --- Related products (same category) ---
+
+async function renderRelatedProducts(product) {
+  const section = document.getElementById('relatedSection');
+  const grid = document.getElementById('relatedGrid');
+  if (!section || !grid) return;
+
+  const categoryId = product.category && product.category._id ? product.category._id : product.category;
+  if (!categoryId) {
+    section.style.display = 'none';
+    return;
+  }
+
+  try {
+    const res = await api.get(`/products${qs({ category: categoryId, limit: 9 })}`);
+    const related = res.data.filter((p) => p._id !== product._id).slice(0, 4);
+
+    if (related.length === 0) {
+      section.style.display = 'none';
+      return;
+    }
+
+    section.style.display = 'block';
+    grid.innerHTML = related.map(renderProductCard).join('');
+    wireProductCardActions(grid);
+    if (window.NoveAnimations) window.NoveAnimations.observeReveal(grid);
+  } catch (err) {
+    section.style.display = 'none';
+  }
+}
+
+// --- Recently viewed (localStorage, this browser only) ---
+
+const RECENTLY_VIEWED_KEY = 'nove_recently_viewed';
+const RECENTLY_VIEWED_MAX = 8;
+
+function getRecentlyViewed() {
+  try {
+    const raw = localStorage.getItem(RECENTLY_VIEWED_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch (err) {
+    return [];
+  }
+}
+
+function recordRecentlyViewed(product) {
+  try {
+    const items = getRecentlyViewed().filter((p) => p._id !== product._id);
+    items.unshift(product);
+    localStorage.setItem(RECENTLY_VIEWED_KEY, JSON.stringify(items.slice(0, RECENTLY_VIEWED_MAX)));
+  } catch (err) {
+    // localStorage unavailable/full — recently-viewed is a non-critical nicety.
+  }
+}
+
+function renderRecentlyViewed(currentProductId) {
+  const section = document.getElementById('recentlyViewedSection');
+  const grid = document.getElementById('recentlyViewedGrid');
+  if (!section || !grid) return;
+
+  const items = getRecentlyViewed().filter((p) => p._id !== currentProductId);
+  if (items.length === 0) {
+    section.style.display = 'none';
+    return;
+  }
+
+  section.style.display = 'block';
+  grid.innerHTML = items.map(renderProductCard).join('');
+  wireProductCardActions(grid);
+  if (window.NoveAnimations) window.NoveAnimations.observeReveal(grid);
+}
+
+// --- Mobile sticky Add to Cart bar ---
+// Hidden until the main Add to Cart button scrolls out of view, so it never
+// duplicates the primary CTA while it's already on screen.
+function wireStickyAddToCart(product) {
+  const stickyBar = document.getElementById('mobileStickyCta');
+  const trigger = document.getElementById('addToCartBtn');
+  const stickyBtn = document.getElementById('stickyAddToCartBtn');
+  if (!stickyBar || !trigger || !stickyBtn) return;
+
+  const nameEl = document.getElementById('stickyName');
+  const priceEl = document.getElementById('stickyPrice');
+  if (nameEl) nameEl.textContent = product.name;
+  if (priceEl) priceEl.textContent = formatMoney(productCurrentPrice(product));
+
+  if (product.stock <= 0) {
+    stickyBtn.disabled = true;
+    stickyBtn.textContent = 'Out of Stock';
+  }
+
+  stickyBtn.addEventListener('click', async () => {
+    if (product.stock <= 0) return;
+    const qtyInput = document.getElementById('qtyInput');
+    stickyBtn.disabled = true;
+    try {
+      await addProductToCart(product._id, Number(qtyInput.value) || 1);
+    } catch (err) {
+      alert(err.message);
+    } finally {
+      stickyBtn.disabled = false;
+    }
+  });
+
+  if ('IntersectionObserver' in window) {
+    const observer = new IntersectionObserver(([entry]) => {
+      stickyBar.classList.toggle('active', !entry.isIntersecting);
+    }, { threshold: 0 });
+    observer.observe(trigger);
+  }
 }
 
 async function wireReviewForm(productId) {
@@ -552,7 +843,11 @@ async function initProductDetailPage() {
     document.getElementById('detailName').textContent = product.name;
     document.getElementById('detailDescription').textContent = product.description;
     document.getElementById('detailRatingStars').textContent = starsHtml(product.ratingsAverage);
-    document.getElementById('detailRatingCount').textContent = `(${product.ratingsCount} reviews)`;
+    document.getElementById('detailRatingCount').textContent = `(${product.ratingsCount} review${product.ratingsCount === 1 ? '' : 's'})`;
+    const reviewCountLabel = document.getElementById('reviewCountLabel');
+    if (reviewCountLabel) reviewCountLabel.textContent = `(${reviews.length})`;
+
+    renderBreadcrumb(product);
 
     const price = productCurrentPrice(product);
     const onSale = price < product.price;
@@ -560,24 +855,38 @@ async function initProductDetailPage() {
     const strikeEl = document.getElementById('detailPriceStrike');
     strikeEl.textContent = onSale ? formatMoney(product.price) : '';
     strikeEl.style.display = onSale ? 'inline' : 'none';
+    const salePillEl = document.getElementById('detailSalePill');
+    if (salePillEl) salePillEl.style.display = onSale ? 'inline-block' : 'none';
 
     const stockNote = document.getElementById('stockNote');
     const addBtn = document.getElementById('addToCartBtn');
+    const buyNowBtn = document.getElementById('buyNowBtn');
     if (product.stock <= 0) {
       stockNote.textContent = 'Out of stock';
-      stockNote.style.color = 'var(--danger)';
+      stockNote.className = 'stock-note out-of-stock-note';
       addBtn.disabled = true;
+      if (buyNowBtn) buyNowBtn.disabled = true;
     } else {
-      stockNote.textContent = `${product.stock} in stock`;
+      stockNote.textContent = product.stock <= 5 ? `Only ${product.stock} left in stock` : `${product.stock} in stock`;
+      stockNote.className = 'stock-note in-stock-note';
       addBtn.disabled = false;
+      if (buyNowBtn) buyNowBtn.disabled = false;
     }
 
     await renderSwatches(product);
     renderGallery(product);
     renderReviews(reviews);
-    wireTabs();
+    renderProductSpecs(product);
+    renderApplicationCare(product);
+    renderShippingFacts();
+    wireAccordion();
     wireSizeGuide(product);
     if (typeof initProductGallery === 'function') initProductGallery(product._id);
+
+    const faqSizeItem = document.getElementById('faqSizeItem');
+    if (faqSizeItem && product.attributes && product.attributes.type === 'press-ons') {
+      faqSizeItem.style.display = 'block';
+    }
 
     const qtyInput = document.getElementById('qtyInput');
     document.getElementById('qtyDec').addEventListener('click', () => {
@@ -602,6 +911,28 @@ async function initProductDetailPage() {
       }
     });
 
+    if (buyNowBtn) {
+      // Adds to cart without popping the cart drawer (pointless right before
+      // navigating straight to checkout) and reuses the same underlying calls
+      // as addProductToCart.
+      buyNowBtn.addEventListener('click', async () => {
+        buyNowBtn.disabled = true;
+        try {
+          await window.noveUserReady;
+          const quantity = Number(qtyInput.value) || 1;
+          if (window.noveUser) {
+            await api.post('/cart/items', { productId: product._id, quantity });
+          } else {
+            addToGuestCart(product._id, quantity);
+          }
+          window.location.href = '/checkout.html';
+        } catch (err) {
+          buyNowBtn.disabled = false;
+          alert(err.message);
+        }
+      });
+    }
+
     const wishlistBtn = document.getElementById('detailWishlistBtn');
     wishlistBtn.addEventListener('click', async () => {
       await window.noveUserReady;
@@ -617,6 +948,11 @@ async function initProductDetailPage() {
         alert(err.message);
       }
     });
+
+    wireStickyAddToCart(product);
+    renderRecentlyViewed(product._id);
+    recordRecentlyViewed(product);
+    renderRelatedProducts(product);
 
     await wireReviewForm(product._id);
   } catch (err) {

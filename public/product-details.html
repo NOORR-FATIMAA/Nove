@@ -37,10 +37,13 @@
 
   <main class="section">
     <div class="container" id="productDetailRoot">
+      <nav class="breadcrumb" id="detailBreadcrumb" aria-label="Breadcrumb"></nav>
+
       <div class="product-detail">
         <div class="gallery">
-          <div class="gallery-main">
+          <div class="gallery-main" id="galleryMainWrap">
             <img id="galleryMainImg" src="" alt="">
+            <button type="button" class="gallery-zoom-btn" id="galleryZoomBtn" aria-label="View larger image">&#128269;</button>
           </div>
           <div class="gallery-thumbs" id="galleryThumbs"></div>
         </div>
@@ -48,72 +51,183 @@
         <div class="detail-info">
           <span class="cat-label" id="detailCategory"></span>
           <h1 id="detailName"></h1>
-          <span class="stars" id="detailRatingStars"></span>
-          <span id="detailRatingCount"></span>
+          <div class="detail-rating-row">
+            <span class="stars" id="detailRatingStars"></span>
+            <span id="detailRatingCount"></span>
+          </div>
 
           <div class="detail-price">
             <span id="detailPrice"></span>
             <span class="price-strike" id="detailPriceStrike"></span>
+            <span class="sale-pill" id="detailSalePill" style="display:none;">On Sale</span>
           </div>
+
+          <p class="stock-note" id="stockNote"></p>
 
           <div id="productAttributes"></div>
 
           <div class="detail-actions">
             <div class="qty-selector">
-              <button type="button" id="qtyDec">-</button>
-              <input type="number" id="qtyInput" value="1" min="1">
-              <button type="button" id="qtyInc">+</button>
+              <button type="button" id="qtyDec" aria-label="Decrease quantity">-</button>
+              <input type="number" id="qtyInput" value="1" min="1" aria-label="Quantity">
+              <button type="button" id="qtyInc" aria-label="Increase quantity">+</button>
             </div>
             <button type="button" class="btn" id="addToCartBtn">Add to Cart</button>
-            <button type="button" class="btn btn-outline" id="detailWishlistBtn">&#9825; Wishlist</button>
+            <button type="button" class="btn btn-dark" id="buyNowBtn">Buy Now</button>
           </div>
 
-          <p class="stock-note" id="stockNote"></p>
+          <button type="button" class="btn btn-outline btn-block btn-sm" id="detailWishlistBtn">&#9825; Add to Wishlist</button>
 
           <button type="button" class="btn btn-ghost btn-sm size-guide-trigger" id="sizeGuideTrigger" style="display:none;padding-left:0;">📏 Size &amp; Fit Guide</button>
 
-          <div class="tabs">
-            <button type="button" class="tab-btn active" data-tab-target="tabDescription">Description</button>
-            <button type="button" class="tab-btn" data-tab-target="tabReviews">Reviews</button>
+          <div class="trust-badges">
+            <div class="trust-badge"><span aria-hidden="true">📦</span> Cash on Delivery available</div>
+            <div class="trust-badge"><span aria-hidden="true">🔒</span> Secure checkout</div>
+            <div class="trust-badge"><span aria-hidden="true">✅</span> Verified customer reviews</div>
           </div>
 
-          <div class="tab-panel active" id="tabDescription">
-            <p id="detailDescription"></p>
-          </div>
-
-          <div class="tab-panel" id="tabReviews">
-            <div id="reviewsList"></div>
-
-            <h4 style="margin-top:24px;">Write a Review</h4>
-            <p id="reviewLoginPrompt" style="display:none;"><a href="/login.html">Log in</a> to write a review.</p>
-            <form id="reviewForm">
-              <div class="alert" id="reviewFormAlert"></div>
-              <div class="form-group">
-                <label for="reviewRating">Rating</label>
-                <select id="reviewRating" name="rating" required>
-                  <option value="5">5 - Excellent</option>
-                  <option value="4">4 - Good</option>
-                  <option value="3">3 - Average</option>
-                  <option value="2">2 - Poor</option>
-                  <option value="1">1 - Terrible</option>
-                </select>
+          <div class="accordion" id="detailAccordion">
+            <div class="accordion-item open">
+              <button type="button" class="accordion-header" aria-expanded="true">
+                <span>Description</span><span class="accordion-icon" aria-hidden="true">&#43;</span>
+              </button>
+              <div class="accordion-panel">
+                <div class="accordion-panel-inner">
+                  <p id="detailDescription"></p>
+                </div>
               </div>
-              <div class="form-group">
-                <label for="reviewComment">Comment</label>
-                <textarea id="reviewComment" name="comment" required></textarea>
+            </div>
+
+            <div class="accordion-item" id="productSpecsItem" style="display:none;">
+              <button type="button" class="accordion-header" aria-expanded="false">
+                <span>Product Details</span><span class="accordion-icon" aria-hidden="true">&#43;</span>
+              </button>
+              <div class="accordion-panel">
+                <div class="accordion-panel-inner">
+                  <dl class="spec-list" id="productSpecsList"></dl>
+                </div>
               </div>
-              <button type="submit" class="btn">Submit Review</button>
-            </form>
+            </div>
+
+            <div class="accordion-item">
+              <button type="button" class="accordion-header" aria-expanded="false">
+                <span>Application &amp; Care</span><span class="accordion-icon" aria-hidden="true">&#43;</span>
+              </button>
+              <div class="accordion-panel">
+                <div class="accordion-panel-inner" id="applicationCareContent"></div>
+              </div>
+            </div>
+
+            <div class="accordion-item">
+              <button type="button" class="accordion-header" aria-expanded="false">
+                <span>Shipping &amp; Payment</span><span class="accordion-icon" aria-hidden="true">&#43;</span>
+              </button>
+              <div class="accordion-panel">
+                <div class="accordion-panel-inner">
+                  <ul class="info-list">
+                    <li>Pay by <strong>Cash on Delivery</strong> or <strong>Credit/Debit Card</strong> at checkout.</li>
+                    <li>Flat-rate shipping of <strong id="shipFeeAmount">Rs 200</strong>, free on orders over <strong id="freeShipThreshold">Rs 5,000</strong>.</li>
+                    <li>Track any order's status from <a href="/account.html">Account</a> → <a href="/orders.html">Orders</a>.</li>
+                    <li>Questions about your order? <a href="/contact.html">Contact our support team</a>.</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <div class="accordion-item">
+              <button type="button" class="accordion-header" aria-expanded="false">
+                <span>FAQs</span><span class="accordion-icon" aria-hidden="true">&#43;</span>
+              </button>
+              <div class="accordion-panel">
+                <div class="accordion-panel-inner">
+                  <div class="faq-item">
+                    <h4>What payment methods can I use?</h4>
+                    <p>Cash on Delivery and Credit/Debit Card — choose either one at checkout.</p>
+                  </div>
+                  <div class="faq-item" id="faqSizeItem" style="display:none;">
+                    <h4>How do I find my size?</h4>
+                    <p>Use the Size &amp; Fit Guide above to measure your natural nails and pick the closest match for each finger.</p>
+                  </div>
+                  <div class="faq-item">
+                    <h4>How can I track my order?</h4>
+                    <p>Log in and visit <a href="/orders.html">Account → Orders</a> to see the latest status of any order.</p>
+                  </div>
+                  <div class="faq-item">
+                    <h4>Can I leave a review?</h4>
+                    <p>Yes — scroll down to the Reviews section below and share your rating once you've tried it.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="accordion-item">
+              <button type="button" class="accordion-header" aria-expanded="false">
+                <span>Reviews <span id="reviewCountLabel"></span></span><span class="accordion-icon" aria-hidden="true">&#43;</span>
+              </button>
+              <div class="accordion-panel">
+                <div class="accordion-panel-inner">
+                  <div id="reviewsList"></div>
+
+                  <h4 style="margin-top:24px;">Write a Review</h4>
+                  <p id="reviewLoginPrompt" style="display:none;"><a href="/login.html">Log in</a> to write a review.</p>
+                  <form id="reviewForm">
+                    <div class="alert" id="reviewFormAlert"></div>
+                    <div class="form-group">
+                      <label for="reviewRating">Rating</label>
+                      <select id="reviewRating" name="rating" required>
+                        <option value="5">5 - Excellent</option>
+                        <option value="4">4 - Good</option>
+                        <option value="3">3 - Average</option>
+                        <option value="2">2 - Poor</option>
+                        <option value="1">1 - Terrible</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label for="reviewComment">Comment</label>
+                      <textarea id="reviewComment" name="comment" required></textarea>
+                    </div>
+                    <button type="submit" class="btn">Submit Review</button>
+                  </form>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
+
+      <section class="section" id="relatedSection" style="display:none;">
+        <h2 class="section-title reveal">You May Also Like</h2>
+        <div class="product-grid" id="relatedGrid"></div>
+      </section>
 
       <section class="section" id="productGallerySection" style="display:none;padding-bottom:0;">
         <h2 class="section-title reveal">Styled by Customers</h2>
         <div class="gallery-masonry" id="productGalleryGrid"></div>
       </section>
+
+      <section class="section" id="recentlyViewedSection" style="display:none;">
+        <h2 class="section-title reveal">Recently Viewed</h2>
+        <div class="product-grid" id="recentlyViewedGrid"></div>
+      </section>
     </div>
   </main>
+
+  <div class="modal-overlay lightbox-overlay" id="lightboxModal">
+    <div class="lightbox-dialog" role="dialog" aria-modal="true" aria-label="Product image viewer">
+      <button type="button" class="modal-close" id="lightboxCloseBtn" aria-label="Close">&times;</button>
+      <button type="button" class="lightbox-nav lightbox-prev" id="lightboxPrevBtn" aria-label="Previous image">&#10094;</button>
+      <img id="lightboxImg" src="" alt="">
+      <button type="button" class="lightbox-nav lightbox-next" id="lightboxNextBtn" aria-label="Next image">&#10095;</button>
+    </div>
+  </div>
+
+  <div class="mobile-sticky-cta" id="mobileStickyCta">
+    <div class="mobile-sticky-info">
+      <span class="mobile-sticky-name" id="stickyName"></span>
+      <span class="mobile-sticky-price" id="stickyPrice"></span>
+    </div>
+    <button type="button" class="btn btn-sm" id="stickyAddToCartBtn">Add to Cart</button>
+  </div>
 
   <div class="modal-overlay" id="sizeGuideModal">
     <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="sizeGuideTitle">
