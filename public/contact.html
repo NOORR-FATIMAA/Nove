@@ -9,25 +9,45 @@
   <script src="/js/theme.js"></script>
 </head>
 <body>
-  <header class="site-header">
+    <div id="promoBanner" class="promo-banner"></div>
+
+  <header class="site-header" id="siteHeader">
     <div class="container header-inner">
+      <button type="button" class="mobile-nav-toggle" id="mobileNavToggle" aria-label="Toggle menu" aria-expanded="false" aria-controls="mainNav">
+        <span class="bar"></span>
+        <span class="bar"></span>
+        <span class="bar"></span>
+      </button>
+
       <a href="/index.html" class="logo"><img src="/img/logo.png" alt="Nove" class="logo-img"></a>
-      <nav class="main-nav" id="mainNav">
-        <a href="/index.html">Home</a>
-        <a href="/products.html">Products</a>
-        <a href="/about.html">About</a>
-        <a href="/contact.html" class="active">Contact</a>
-      </nav>
+
       <div class="header-actions">
+        <form class="nav-search" id="navSearchForm">
+          <input type="search" id="navSearchInput" placeholder="Search shades, sets...">
+        </form>
+        <a href="/orders.html" class="icon-link" aria-label="Track Order">&#128230;</a>
         <a href="/wishlist.html" class="icon-link" aria-label="Wishlist">&#9825;<span class="badge" id="wishlistCount">0</span></a>
         <a href="/cart.html" class="icon-link" aria-label="Cart">&#128717;<span class="badge" id="cartCount">0</span></a>
         <div id="themeToggle" class="theme-toggle"></div>
         <div id="authArea"></div>
-        <button type="button" class="mobile-nav-toggle" id="mobileNavToggle" aria-label="Toggle menu" aria-expanded="false" aria-controls="mainNav">
-          <span class="bar"></span>
-          <span class="bar"></span>
-          <span class="bar"></span>
-        </button>
+      </div>
+    </div>
+
+    <div class="header-nav-row">
+      <div class="container">
+        <nav class="main-nav" id="mainNav">
+          <a href="/index.html">Home</a>
+          <a href="/products.html">Shop All</a>
+          <div class="nav-dropdown" id="shopCategoryDropdown">
+            <button type="button" class="nav-dropdown-trigger" id="shopCategoryTrigger" aria-expanded="false" aria-haspopup="true" aria-controls="navMegaMenu">
+              Shop by Category <span class="nav-caret" aria-hidden="true">&#9662;</span>
+            </button>
+            <div class="nav-mega-menu" id="navMegaMenu"></div>
+          </div>
+          <a href="/products.html?sort=-createdAt">New Arrivals</a>
+          <a href="/about.html">About</a>
+          <a href="/contact.html">Contact</a>
+        </nav>
       </div>
     </div>
   </header>
@@ -82,6 +102,7 @@
   <script src="/js/storage.js"></script>
   <script src="/js/currency.js"></script>
   <script src="/js/nav.js"></script>
+  <script src="/js/home-content.js"></script>
   <script src="/js/animations.js"></script>
 </body>
 </html>

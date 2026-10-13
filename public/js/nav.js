@@ -80,14 +80,84 @@ async function updateWishlistBadge() {
   }
 }
 
+// Direct children only — on mobile the drawer also holds the reparented
+// account links and filters, which shouldn't be treated as primary nav.
+//
+// Matches the query string too (not just the path), since "Shop All" and
+// "New Arrivals" both point at products.html — comparing paths alone would
+// light up both at once any time either is active.
 function highlightActiveNav() {
-  const path = window.location.pathname.split('/').pop() || 'index.html';
-  // Direct children only — on mobile the drawer also holds the reparented
-  // account links and filters, which shouldn't be treated as primary nav.
+  const currentPath = window.location.pathname.split('/').pop() || 'index.html';
+  const currentSearch = window.location.search;
+
   document.querySelectorAll('.main-nav > a').forEach((a) => {
-    const href = a.getAttribute('href').split('?')[0].split('/').pop();
-    if (href === path) a.classList.add('active');
+    const [hrefPath, hrefSearch = ''] = a.getAttribute('href').split('?');
+    const hrefFile = hrefPath.split('/').pop();
+    if (hrefFile !== currentPath) return;
+
+    const hrefQuery = hrefSearch ? `?${hrefSearch}` : '';
+    if (hrefQuery === currentSearch) a.classList.add('active');
   });
+}
+
+// "Shop by Category" mega-menu: a real, live list of categories (same data
+// and images as the homepage category grid), not a static/fabricated menu.
+function initShopMegaMenu() {
+  const dropdown = document.getElementById('shopCategoryDropdown');
+  const trigger = document.getElementById('shopCategoryTrigger');
+  const menu = document.getElementById('navMegaMenu');
+  if (!dropdown || !trigger || !menu) return;
+
+  function closeMenu() {
+    dropdown.classList.remove('open');
+    trigger.setAttribute('aria-expanded', 'false');
+  }
+
+  function openMenu() {
+    dropdown.classList.add('open');
+    trigger.setAttribute('aria-expanded', 'true');
+  }
+
+  trigger.addEventListener('click', () => {
+    if (dropdown.classList.contains('open')) {
+      closeMenu();
+    } else {
+      openMenu();
+    }
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!dropdown.contains(e.target)) closeMenu();
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && dropdown.classList.contains('open')) {
+      closeMenu();
+      trigger.focus();
+    }
+  });
+
+  api
+    .get('/categories')
+    .then((res) => {
+      if (!res.data || res.data.length === 0) {
+        menu.innerHTML = '<p class="nav-mega-menu-empty">No categories yet.</p>';
+        return;
+      }
+      menu.innerHTML = res.data
+        .map(
+          (cat) => `
+          <a class="nav-mega-menu-item" href="/products.html?category=${encodeURIComponent(cat._id)}">
+            ${cat.image ? `<img src="${escapeHtml(cat.image)}" alt="${escapeHtml(cat.name)}">` : ''}
+            <span>${escapeHtml(cat.name)}</span>
+          </a>
+        `
+        )
+        .join('');
+    })
+    .catch(() => {
+      menu.innerHTML = '<p class="nav-mega-menu-empty">Could not load categories.</p>';
+    });
 }
 
 // Fixed bottom nav shown only under the same ~900px breakpoint the header
@@ -320,6 +390,7 @@ async function initNav() {
   wireNewsletterForm();
   wireContactForm();
   initMobileNav();
+  initShopMegaMenu();
 }
 
 document.addEventListener('DOMContentLoaded', initNav);

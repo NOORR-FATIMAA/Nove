@@ -350,13 +350,40 @@ p {
   z-index: 50;
 }
 
+/* The logo is absolutely centered on the row rather than placed via a
+   1fr/auto/1fr grid — that trick only centers correctly when both flanking
+   columns have equal content width, which these don't (an empty/hidden
+   toggle on one side, a cluster of search+icons+auth on the other). Absolute
+   centering keeps the logo dead-center regardless of either side's width. */
 .header-inner {
+  position: relative;
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: 20px;
+  min-height: 44px;
   padding-top: 14px;
   padding-bottom: 14px;
+}
+
+.header-inner .logo {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.header-inner .header-actions {
+  margin-left: auto;
+}
+
+.header-nav-row {
+  border-top: 1px solid var(--border);
+  background: var(--cream-dark);
+}
+
+.header-nav-row .container {
+  display: flex;
+  justify-content: center;
 }
 
 .logo {
@@ -377,8 +404,10 @@ p {
 
 .main-nav {
   display: flex;
+  align-items: center;
   gap: 22px;
   flex-wrap: wrap;
+  padding: 12px 0;
 }
 
 .main-nav a {
@@ -393,6 +422,98 @@ p {
 .main-nav a.active {
   color: var(--rose-dark);
   border-color: var(--rose);
+}
+
+/* --- "Shop by Category" mega-menu --- */
+
+.nav-dropdown {
+  position: relative;
+}
+
+.nav-dropdown-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--ink);
+  padding: 6px 2px;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+}
+
+.nav-dropdown-trigger:hover,
+.nav-dropdown.open .nav-dropdown-trigger {
+  color: var(--rose-dark);
+  border-color: var(--rose);
+}
+
+.nav-caret {
+  font-size: 0.65rem;
+  transition: transform 0.2s ease;
+}
+
+.nav-dropdown.open .nav-caret {
+  transform: rotate(180deg);
+}
+
+.nav-mega-menu {
+  display: none;
+  position: absolute;
+  top: calc(100% + 14px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 20px;
+  z-index: 60;
+  min-width: 480px;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: 16px;
+}
+
+.nav-dropdown.open .nav-mega-menu {
+  display: grid;
+}
+
+.nav-mega-menu-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
+  padding: 8px;
+  border-radius: var(--radius-sm);
+}
+
+.nav-mega-menu-item:hover {
+  background: var(--cream-dark);
+}
+
+.nav-mega-menu-item img {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+  background: var(--cream-dark);
+}
+
+.nav-mega-menu-item span {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.nav-mega-menu-empty {
+  grid-column: 1 / -1;
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+  margin: 0;
 }
 
 .header-actions {
@@ -2488,12 +2609,44 @@ body.cart-drawer-locked {
     grid-template-columns: 1fr;
   }
 
-  .header-inner {
+  /* The nav row collapses to zero height here (its only child, .main-nav, is
+     display:none below) but stays the positioned anchor for the mobile drawer,
+     so it must shed its own border/background or a 1px hairline would still
+     show across the header even while the drawer is closed. */
+  .header-nav-row {
     position: relative;
+    border-top: none;
+    background: none;
   }
 
   .main-nav {
     display: none;
+  }
+
+  .nav-dropdown {
+    width: 100%;
+  }
+
+  .nav-dropdown-trigger {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .nav-mega-menu {
+    position: static;
+    transform: none;
+    box-shadow: none;
+    border: none;
+    border-radius: 0;
+    background: var(--cream-dark);
+    padding: 10px 0 10px 16px;
+    margin: 4px 0 4px;
+    min-width: 0;
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .nav-mega-menu-item img {
+    aspect-ratio: 1 / 1;
   }
 
   .main-nav.mobile-open {
@@ -2515,6 +2668,14 @@ body.cart-drawer-locked {
   .main-nav.mobile-open > a {
     padding: 13px 0;
     border-bottom: 1px solid var(--border);
+  }
+
+  .main-nav.mobile-open > .nav-dropdown {
+    border-bottom: 1px solid var(--border);
+  }
+
+  .main-nav.mobile-open > .nav-dropdown .nav-dropdown-trigger {
+    padding: 13px 0;
   }
 
   .mobile-nav-divider {

@@ -1,5 +1,6 @@
-// Homepage-only: admin-controlled promo banner + hero background media
-// (video or image), both driven by /api/settings.
+// Site-wide admin-controlled promo banner, plus homepage-only hero background
+// media (video or image) — both driven by /api/settings. Pages without a
+// hero section simply skip that half via the element-existence checks below.
 
 function simpleHash(str) {
   let hash = 0;
